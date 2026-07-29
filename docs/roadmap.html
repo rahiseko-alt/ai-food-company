@@ -120,18 +120,29 @@
     "title": "ロードマップ（白紙テンプレ）",
     "template": true,
     "active": "ROOT",
-    "next": "【初回】この案件のゴールを頂点に原子ツリーを描く。meta.handoff.nav（初回接続トップ手順ナビ）に従い、AGENTS.md『新規案件の初期化フロー(0〜6)』の6でこの roadmap.html を描き直す。描き直したら meta.template を false にする。ツリー確定まで実装・調査・ファイル作成には着手しない。",
+    "next": "【初回】ゴール定義ゲート（docs/goal-gate.md）を通してから、この案件のゴールを頂点に原子ツリーを描く。meta.handoff.nav（初回接続トップ手順ナビ）に従い、AGENTS.md『新規案件の初期化フロー(0〜7)』の6でゲート、7でこの roadmap.html を描き直す。描き直したら meta.template を false にする。ツリー確定まで実装・調査・ファイル作成には着手しない。",
+    "goalgate": {
+      "answers": { "q1": "", "q2": "", "q3": "", "q4": "", "q5": "", "q6": "", "q7": "", "q8": "" },
+      "checks": { "chk1": "", "chk2": "", "chk3": "" },
+      "evidence_state": "",
+      "assumption": "",
+      "falsify": "",
+      "deadline": "",
+      "judged_by": "",
+      "_note": "（白紙テンプレ）nav 手順5 でサブA(goal-drafter)が answers を埋め、サブB(basis-reviewer)が採点し、人間が争点ごとに直させる/通すを選ぶ。書き方の正は docs/goal-gate.md。"
+    },
     "handoff": {
-      "done": "（白紙テンプレの初期状態）まだ何も実施していません。これはコピー元テンプレのロードマップです。実作業を始める前に、必ず下の nav（初回接続トップ手順ナビ）を上から順に辿ってください。",
+      "done": "（白紙テンプレの初期状態）まだ何も実施していません。これはコピー元テンプレのロードマップです。実作業を始める前に、必ず下の nav（初回接続トップ手順ナビ）を上から順に辿ってください。ツリーを描く前に手順5『ゴール定義ゲート』があります（docs/goal-gate.md）。",
       "trouble": "無し",
       "nav": [
         "1. チェックイン：この handoff と meta.active/meta.next を読み、ユーザーへ『白紙テンプレなので、まず案件のゴールをヒアリングして原子ツリーを描きます』と丁寧語で伝える。",
         "2. 機械強制(新リポジトリで1回だけ／管理者の手作業。CIやAIからは不可)：(a)リポジトリを Public にする(無料Private では branch protection/Ruleset が効かない)。(b)main に ci-green 必須化＝Settings→Rules→Rulesets→New branch ruleset で Enforcement=Active・Target=Include default branch・Require status checks(ci-green)・さらに『Require a pull request before merging』(Required approvals=0のまま)も必ずチェックする(これが無いと main への直pushでCIを丸ごと迂回できる＝実地で確認済みの最重要ハマりどころ)。最初のPRが1回走った後、同じ画面で roadmap-required も必須チェックに追加。(c)Settings→Security→Code security で Secret Protection・Push protection を Enable。(d)Dependabot version updates は .github/dependabot.yml が同梱済みなので追加設定不要。詳細は AGENTS.md『新規案件の初期化フロー』手順0。",
         "3. ヒアリング→リサーチ→提案→承認：AGENTS.md『新規案件の初期化フロー 1〜4』でスタック(クラウド/言語/FW/パッケージ/DB/認証/IaC/テスト/CI/Lint)を確定する。黙って進めない＝ユーザーの明示OKを取る。",
         "4. 設定：承認された構成を、案件の AGENTS.md(presets/_TEMPLATE.md を複製)に宣言する。",
-        "5. 原子ツリー作成(第一成果物)：案件のゴールを頂点に、この roadmap.html の nodes を原子レベル(1葉=1事実=1verify)まで描き直す。ROOT プレースホルダは破棄。各葉に criteria/verify を置く。",
-        "6. テンプレ解除：meta.template を false（または削除）にし、meta.active を実ノードIDへ、meta.handoff.done/trouble を実セッションの内容へ上書き、nav は削除する。以降 CI(verify-roadmap-evidence)が本物の原子ツリーを機械強制する。",
-        "7. 実装開始：ツリー確定後、meta.active が指す葉から着手する。以降は checkin-checkout スキルの通常運用(handoff 上書き＋failures.md 追記)へ移行する。"
+        "5. ゴール定義ゲート(ツリーの直前の関所／正は docs/goal-gate.md)：サブA(goal-drafter)に8つの問いへ答えさせる → サブB(basis-reviewer)に却下条件を1個ずつ当てさせる → B が出した争点ごとに、ユーザー(人間)が『直させる／通す(理由を記録)』を選ぶ。突き合わせ3本(CHK1〜3)が1本でも切れていればゴール未確定＝手順6に進まず A に書き直させる。結果は meta.goalgate に残す。A と B は必ず別のサブエージェントにする(同一セッションが書いて採点する＝本人採点は禁止)。",
+        "6. 原子ツリー作成(第一成果物)：ゲートを通したゴールを頂点に、この roadmap.html の nodes を原子レベル(1葉=1事実=1verify)まで描き直す。ROOT プレースホルダは破棄。各葉に criteria/verify を置く。",
+        "7. テンプレ解除：meta.template を false（または削除）にし、meta.active を実ノードIDへ、meta.handoff.done/trouble を実セッションの内容へ上書き、nav は削除する。以降 CI(verify-roadmap-evidence)が本物の原子ツリーを機械強制する。",
+        "8. 実装開始：ツリー確定後、meta.active が指す葉から着手する。以降は checkin-checkout スキルの通常運用(handoff 上書き＋failures.md 追記)へ移行する。"
       ]
     },
     "updated": "2026-07-28"
@@ -140,7 +151,7 @@
     { "id":"ROOT", "kind":"state",
       "theme":"（白紙）ここに案件のゴールを置く",
       "meaning":"コピー直後のテンプレ。実作業前に描き直す単一プレースホルダ",
-      "detail":"この ROOT はテンプレの残骸。meta.handoff.nav（初回接続トップ手順ナビ）に従い、案件のゴールを頂点にした原子ツリーへ描き直し、meta.template を false にする。それまで実装着手しない" }
+      "detail":"この ROOT はテンプレの残骸。meta.handoff.nav（初回接続トップ手順ナビ）に従い、まず手順5のゴール定義ゲート（docs/goal-gate.md）でゴールを確定し、そのゴールを頂点にした原子ツリーへ描き直して meta.template を false にする。それまで実装着手しない" }
   ]
 }
 </script>
@@ -168,6 +179,8 @@
       リポジトリにまずこれ1個あれば、ここから開始できる。用途は<b>計画先行の進捗管理</b>で、
       アプリ開発でも任意の長期計画でも使える汎用の表。</p>
       <p class="rule">案件の絶対起点：どんな依頼でも、実装より先にこの原子ツリーを作る（例外なし・AI裁量ゼロ）。
+      ツリーを描く<b>直前</b>にゴール定義ゲート（<code>docs/goal-gate.md</code>）を通す＝サブAが8問に答え、
+      サブB(basis-reviewer)が却下条件を当て、<b>人間が争点ごとに直させる/通すを選ぶ</b>。回答は <code>meta.goalgate</code> に残す。
       正の運用ルールはルート <code>AGENTS.md</code>「案件の絶対起点」。cc-v2 をコピーして始めた新案件は、
       同梱ノードを破棄し新案件のゴールから描き直すのが第一コミット。</p>
 
