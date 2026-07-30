@@ -119,8 +119,8 @@
   "meta": {
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
-    "active": "G-2-1",
-    "next": "このPRをマージした後、Cloudflare のダッシュボードで Pages プロジェクトを作り、リポジトリを接続する（docs/site/DEPLOY.md 手順2）。Build output directory は空欄ではなく site を指定する。発行された *.pages.dev で表示を確認したら、手順3でカスタムドメイン food.kouheikosehira.com を繋ぎ、手順4でフォームの初回有効化を行う。＝ G-2-1 → G-2-2 → G-3-1 の順。",
+    "active": "G-4-1",
+    "next": "公開は完了。残るは文言と導線の確定。まず G-4-1＝相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認し、確定した表記で site/index.html を更新する。次に G-4-2（ヘッダーの「お問合せ ›」「ホーム」「よくある質問」が未リンク）。G-4-3（OG画像）は支給待ち。G-3-1/G-3-2 は実運用で届くことをマスターが確認済みだが、機械が検算できる外部事実が無いため evidence は空のまま。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
@@ -145,8 +145,8 @@
       "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "支給された静的サイト一式（kosefoodai.zip）をリポジトリに取り込み、公開できる形に整えました。①配信ファイルを site/ に配置（index.html / assets / _headers）。公開ディレクトリを汚さないよう、README と DEPLOY は docs/site/ へ、単一HTML化ツールは scripts/build-site-single.py へ移動（ROOT を site/ に修正）。②scripts/check-site-assets.mjs（内部参照リンタ）を新規作成し、CI に site ジョブ（リンタ＋静的配信スモークで index 200・マーカー・全アセット200）を追加、ci-green の必須に組み込み。③prod-smoke.yml をテンプレ残骸（cc-v2-web.vercel.app）から food.kouheikosehira.com へ差し替え、公開前に赤くならないよう手動実行(workflow_dispatch)に変更。DNS の無傷確認（apex の A / Google Workspace の MX）も追加。④このロードマップをテンプレ白紙から本案件の原子ツリーへ描き直し、meta.template を false に。",
-      "trouble": "①Cloudflare Pages の作成・カスタムドメイン接続を AI 側から実行できませんでした（API トークンが環境に無く、api.cloudflare.com もプロキシで遮断＝CONNECT 403）。したがって『デプロイ』のうちダッシュボード操作（DEPLOY.md 手順2〜3）とフォーム初回有効化（手順4）はマスターの手作業が必要です。②ゴール定義ゲートを goal-drafter / basis-reviewer のサブエージェント2枚で回していません（本セッションはサブエージェント起動を禁じられているため）。meta.goalgate は下書き扱いで、CHK3（Q4 の証拠が逸話のみ）が切れたまま通してあります。③支給 zip の README が参照していた serve.sh・project/・chats/ は zip に含まれていなかったため、docs/site/README.md を実体に合わせて書き直しました。"
+      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。",
+      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。埋めるなら FormSubmit の送信完了ページURL等が要ります。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。"
     },
     "updated": "2026-07-30"
   },
@@ -169,7 +169,7 @@
               "criteria":[
                 { "text":"site/ に index.html・assets/・_headers が揃った状態で main にマージされている",
                   "verify":"マージ後の main で `ls site/` と `node scripts/check-site-assets.mjs` が通ること。証拠はマージコミットの SHA",
-                  "evidence":"" }
+                  "evidence":"b51a8e66f821f87cd72e45fcfc8264b83a06223a" }
               ] },
             { "id":"G-1-2", "kind":"state",
               "theme":"ページが読み込むファイルに、行き先の無いものが1つも無い",
@@ -178,7 +178,7 @@
               "criteria":[
                 { "text":"site/ 内の HTML/CSS/JS が参照する内部パスが全て実在する（リンク切れ0件）",
                   "verify":"CI の site ジョブ内 `node scripts/check-site-assets.mjs` が exit 0。証拠はその run URL",
-                  "evidence":"" }
+                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30512688163" }
               ] },
             { "id":"G-1-3", "kind":"state",
               "theme":"静的配信したときに、トップページがちゃんと出る",
@@ -187,7 +187,7 @@
               "criteria":[
                 { "text":"site/ を静的配信すると / が 200 を返し、本文に『Kose Food AI』を含み、主要アセットも全て 200",
                   "verify":"CI の site ジョブの配信スモーク（http.server → curl）が exit 0。証拠はその run URL",
-                  "evidence":"" }
+                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30512688163" }
               ] }
           ] },
 
@@ -203,7 +203,7 @@
               "criteria":[
                 { "text":"Pages プロジェクトが rahiseko-alt/ai-food-company に接続され、発行された *.pages.dev が 200 でサイトを表示する",
                   "verify":"発行された *.pages.dev をブラウザとcurlで開いて 200 かつ本文に『Kose Food AI』。証拠はその公開URL",
-                  "evidence":"" }
+                  "evidence":"https://ai-food-company.pages.dev" }
               ] },
             { "id":"G-2-2", "kind":"state",
               "theme":"食べ物のサブドメイン food.kouheikosehira.com で開ける",
@@ -212,7 +212,7 @@
               "criteria":[
                 { "text":"https://food.kouheikosehira.com が 200 を返し、本文に『Kose Food AI』を含む",
                   "verify":"GitHub Actions の prod-smoke を手動実行（Actions → prod-smoke → Run workflow）し緑になること。証拠はその run URL",
-                  "evidence":"" }
+                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30513706224" }
               ] },
             { "id":"G-2-3", "kind":"state",
               "theme":"本番でも、絵とアニメと文字がちゃんと出てくる",
@@ -221,7 +221,7 @@
               "criteria":[
                 { "text":"本番URLで CSS・JS・Lottie・壁紙が全て 200 で配信される",
                   "verify":"prod-smoke の『公開アセットが 200』ステップが緑。証拠はその run URL",
-                  "evidence":"" }
+                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30513706224" }
               ] },
             { "id":"G-2-4", "kind":"state",
               "theme":"今までのサイトと会社のメールが、止まっていない",
@@ -230,7 +230,7 @@
               "criteria":[
                 { "text":"kouheikosehira.com の A レコードが生きており、MX が Google Workspace のままである",
                   "verify":"prod-smoke の『既存サイト・メールが無傷であること』ステップ（dig 実測）が緑。証拠はその run URL",
-                  "evidence":"" }
+                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30513706224" }
               ] }
           ] },
 
