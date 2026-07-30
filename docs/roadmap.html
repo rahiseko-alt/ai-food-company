@@ -117,41 +117,191 @@
 <script type="application/json" id="roadmap-data">
 {
   "meta": {
-    "title": "ロードマップ（白紙テンプレ）",
-    "template": true,
-    "active": "ROOT",
-    "next": "【初回】ゴール定義ゲート（docs/goal-gate.md）を通してから、この案件のゴールを頂点に原子ツリーを描く。meta.handoff.nav（初回接続トップ手順ナビ）に従い、AGENTS.md『新規案件の初期化フロー(0〜7)』の6でゲート、7でこの roadmap.html を描き直す。描き直したら meta.template を false にする。ツリー確定まで実装・調査・ファイル作成には着手しない。",
+    "title": "ロードマップ｜Kose Food AI サイト公開",
+    "template": false,
+    "active": "G-2-1",
+    "next": "このPRをマージした後、Cloudflare のダッシュボードで Pages プロジェクトを作り、リポジトリを接続する（docs/site/DEPLOY.md 手順2）。Build output directory は空欄ではなく site を指定する。発行された *.pages.dev で表示を確認したら、手順3でカスタムドメイン food.kouheikosehira.com を繋ぎ、手順4でフォームの初回有効化を行う。＝ G-2-1 → G-2-2 → G-3-1 の順。",
     "goalgate": {
-      "answers": { "q1": "", "q2": "", "q3": "", "q4": "", "q5": "", "q6": "", "q7": "", "q8": "" },
-      "checks": { "chk1": "", "chk2": "", "chk3": "" },
-      "evidence_state": "",
-      "assumption": "",
-      "falsify": "",
-      "deadline": "",
-      "judged_by": "",
-      "_note": "（白紙テンプレ）nav 手順5 でサブA(goal-drafter)が answers を埋め、サブB(basis-reviewer)が採点し、人間が争点ごとに直させる/通すを選ぶ。書き方の正は docs/goal-gate.md。"
+      "answers": {
+        "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
+        "q2": "人手不足で人を増やせないのに、シフト作成・発注・電話応対・口コミ返信といった毎日必ず発生する事務が現場を圧迫している。ただし『何時間・何円ぶんの負担か』の定量は未確認（マスターの実測値が未提供）。",
+        "q3": "『人を増やす前に、人がやらなくていい仕事を減らす』— 飲食20年の実務を分かっている相手に、現場に入って優先順位を決めてもらい、設定まで済ませてもらえること。便益は1つに絞ってある（ツール販売ではなく代行して設定まで済ませる顧問）。",
+        "q4": "未確認。現時点の根拠はマスター自身の飲食20年の実務経験（逸話）であり、見込み客への聞き取りや反証探しは行っていない。＝ goal-gate.md の3分岐でいう『仮説のまま進める』状態。反証は公開後の問い合わせ件数で取る。",
+        "q5": "理想経路＝サイトを開く→オープニングで『何者か』が伝わる→お品書きで自分の困りごとに当たるメニューを見つける→相談フォームに店名・名前・連絡先・困りごとを入れて送る→返信が来る。失敗経路＝(a)フォーム送信が届かない(FormSubmit 未有効化)、(b)スマホで重い/崩れる、(c)仮の文言（初回相談無料・24時間以内返信等）が実運用と食い違い、期待外れで信用を落とす。",
+        "q6": "やらないこと＝(1)予約・決済・会員機能（相談を受けるだけの1枚に絞る）、(2)CMS/管理画面（更新は git で行う）、(3)ブログ・事例記事（コンテンツ供給が続かないため今回外す）、(4)独自メールフォーム基盤（FormSubmit に寄せる）。いずれもゴールになり得たが、初期の目的は『相談が届くこと』1点なので外した。",
+        "q7": "納品形態＝Cloudflare Pages で https://food.kouheikosehira.com/ に公開された静的サイト。ソースは rahiseko-alt/ai-food-company の site/ 配下。引き継ぎ先＝マスター本人（更新は git push で自動再公開）。公開手順とハマりどころは docs/site/DEPLOY.md。",
+        "q8": "作れる。実測で確認済み＝(a)ドメインのネームサーバーは Cloudflare、food サブドメインは未使用なので既存サイト(Vercel の apex/www)とメール(Google Workspace の MX)に触らず載せられる、(b)静的ファイルのみでビルド不要、(c)ローカル配信で index と全アセットが 200 を返すことを確認済み。未確認＝Cloudflare ダッシュボードの操作とフォーム初回有効化は人手が必要で、AI 側からは実行できない（API トークン無し／api.cloudflare.com へ到達不可）。"
+      },
+      "checks": {
+        "chk1": "OK。Q3『人を増やす前に、人がやらなくていい仕事を減らす（設定まで代行）』は、Q2『事務が現場を圧迫している』を直接解いている。",
+        "chk2": "OK。Q5 の経路（オープニング→お品書き→相談フォーム）は、Q1 のオーナーに Q3 の便益を届けて相談まで繋げている。ただし失敗経路(a)フォーム未有効化が残っている間は届かない＝ G-3-1 が未達なら CHK2 は実質切れる。",
+        "chk3": "切れている。Q4 の根拠がマスターの実務経験（逸話1件）に留まり、Q2 の定量と Q3 の便益を外部の証拠で支えていない。goal-gate.md の3分岐に従い『仮説のまま進める』を選択し、反証条件と期限を下に記録する。"
+      },
+      "evidence_state": "仮説（Q4 未検証）。CHK3 が切れていることを承知のうえで、公開自体は安価・可逆なので進める。",
+      "assumption": "岐阜・愛知の飲食店オーナーは、AI ツールの販売ではなく『現場に入って設定まで済ませる顧問』にお金を払う意思がある。",
+      "falsify": "公開から60日で、サイト経由の相談が1件も入らない場合は、この仮説を誤りとして扱い、訴求（Q3）か顧客（Q1）を作り直す。",
+      "deadline": "公開日から60日",
+      "judged_by": "未（マスター承認待ち）",
+      "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "（白紙テンプレの初期状態）まだ何も実施していません。これはコピー元テンプレのロードマップです。実作業を始める前に、必ず下の nav（初回接続トップ手順ナビ）を上から順に辿ってください。ツリーを描く前に手順5『ゴール定義ゲート』があります（docs/goal-gate.md）。",
-      "trouble": "無し",
-      "nav": [
-        "1. チェックイン：この handoff と meta.active/meta.next を読み、ユーザーへ『白紙テンプレなので、まず案件のゴールをヒアリングして原子ツリーを描きます』と丁寧語で伝える。",
-        "2. 機械強制(新リポジトリで1回だけ／管理者の手作業。CIやAIからは不可)：(a)リポジトリを Public にする(無料Private では branch protection/Ruleset が効かない)。(b)main に ci-green 必須化＝Settings→Rules→Rulesets→New branch ruleset で Enforcement=Active・Target=Include default branch・Require status checks(ci-green)・さらに『Require a pull request before merging』(Required approvals=0のまま)も必ずチェックする(これが無いと main への直pushでCIを丸ごと迂回できる＝実地で確認済みの最重要ハマりどころ)。最初のPRが1回走った後、同じ画面で roadmap-required も必須チェックに追加。(c)Settings→Security→Code security で Secret Protection・Push protection を Enable。(d)Dependabot version updates は .github/dependabot.yml が同梱済みなので追加設定不要。詳細は AGENTS.md『新規案件の初期化フロー』手順0。",
-        "3. ヒアリング→リサーチ→提案→承認：AGENTS.md『新規案件の初期化フロー 1〜4』でスタック(クラウド/言語/FW/パッケージ/DB/認証/IaC/テスト/CI/Lint)を確定する。黙って進めない＝ユーザーの明示OKを取る。",
-        "4. 設定：承認された構成を、案件の AGENTS.md(presets/_TEMPLATE.md を複製)に宣言する。",
-        "5. ゴール定義ゲート(ツリーの直前の関所／正は docs/goal-gate.md)：サブA(goal-drafter)に8つの問いへ答えさせる → サブB(basis-reviewer)に却下条件を1個ずつ当てさせる → B が出した争点ごとに、ユーザー(人間)が『直させる／通す(理由を記録)』を選ぶ。突き合わせ3本(CHK1〜3)が1本でも切れていればゴール未確定＝手順6に進まず A に書き直させる。結果は meta.goalgate に残す。A と B は必ず別のサブエージェントにする(同一セッションが書いて採点する＝本人採点は禁止)。",
-        "6. 原子ツリー作成(第一成果物)：ゲートを通したゴールを頂点に、この roadmap.html の nodes を原子レベル(1葉=1事実=1verify)まで描き直す。ROOT プレースホルダは破棄。各葉に criteria/verify を置く。",
-        "7. テンプレ解除：meta.template を false（または削除）にし、meta.active を実ノードIDへ、meta.handoff.done/trouble を実セッションの内容へ上書き、nav は削除する。以降 CI(verify-roadmap-evidence)が本物の原子ツリーを機械強制する。",
-        "8. 実装開始：ツリー確定後、meta.active が指す葉から着手する。以降は checkin-checkout スキルの通常運用(handoff 上書き＋failures.md 追記)へ移行する。"
-      ]
+      "done": "支給された静的サイト一式（kosefoodai.zip）をリポジトリに取り込み、公開できる形に整えました。①配信ファイルを site/ に配置（index.html / assets / _headers）。公開ディレクトリを汚さないよう、README と DEPLOY は docs/site/ へ、単一HTML化ツールは scripts/build-site-single.py へ移動（ROOT を site/ に修正）。②scripts/check-site-assets.mjs（内部参照リンタ）を新規作成し、CI に site ジョブ（リンタ＋静的配信スモークで index 200・マーカー・全アセット200）を追加、ci-green の必須に組み込み。③prod-smoke.yml をテンプレ残骸（cc-v2-web.vercel.app）から food.kouheikosehira.com へ差し替え、公開前に赤くならないよう手動実行(workflow_dispatch)に変更。DNS の無傷確認（apex の A / Google Workspace の MX）も追加。④このロードマップをテンプレ白紙から本案件の原子ツリーへ描き直し、meta.template を false に。",
+      "trouble": "①Cloudflare Pages の作成・カスタムドメイン接続を AI 側から実行できませんでした（API トークンが環境に無く、api.cloudflare.com もプロキシで遮断＝CONNECT 403）。したがって『デプロイ』のうちダッシュボード操作（DEPLOY.md 手順2〜3）とフォーム初回有効化（手順4）はマスターの手作業が必要です。②ゴール定義ゲートを goal-drafter / basis-reviewer のサブエージェント2枚で回していません（本セッションはサブエージェント起動を禁じられているため）。meta.goalgate は下書き扱いで、CHK3（Q4 の証拠が逸話のみ）が切れたまま通してあります。③支給 zip の README が参照していた serve.sh・project/・chats/ は zip に含まれていなかったため、docs/site/README.md を実体に合わせて書き直しました。"
     },
-    "updated": "2026-07-29"
+    "updated": "2026-07-30"
   },
   "nodes": [
-    { "id":"ROOT", "kind":"state",
-      "theme":"（白紙）ここに案件のゴールを置く",
-      "meaning":"コピー直後のテンプレ。実作業前に描き直す単一プレースホルダ",
-      "detail":"この ROOT はテンプレの残骸。meta.handoff.nav（初回接続トップ手順ナビ）に従い、まず手順5のゴール定義ゲート（docs/goal-gate.md）でゴールを確定し、そのゴールを頂点にした原子ツリーへ描き直して meta.template を false にする。それまで実装着手しない" }
+    { "id":"G", "kind":"state",
+      "theme":"飲食店オーナーが、自分のスマホでサイトを見て相談を送れて、それがマスターに届く",
+      "meaning":"ゴール。作って終わりではなく『相談が実際に届く』まで",
+      "detail":"公開先は https://food.kouheikosehira.com/ 。既存サイト(apex/www の Vercel)とメール(Google Workspace)は無傷のまま、未使用のサブドメインに載せる",
+      "children":[
+
+        { "id":"G-1", "kind":"state",
+          "theme":"公開する中身が、リポジトリに壊れずに入っている",
+          "meaning":"配るファイルそのものが正しい",
+          "detail":"Cloudflare Pages はビルドを挟まない＝リポジトリの site/ がそのまま本番になる。だから『入っている中身が正しい』ことが公開の前提条件になる",
+          "children":[
+            { "id":"G-1-1", "kind":"state",
+              "theme":"配信ファイル一式が main に入っている",
+              "meaning":"公開する材料が揃った",
+              "detail":"site/index.html ＋ site/assets/ ＋ site/_headers。site/ の外は公開されない",
+              "criteria":[
+                { "text":"site/ に index.html・assets/・_headers が揃った状態で main にマージされている",
+                  "verify":"マージ後の main で `ls site/` と `node scripts/check-site-assets.mjs` が通ること。証拠はマージコミットの SHA",
+                  "evidence":"" }
+              ] },
+            { "id":"G-1-2", "kind":"state",
+              "theme":"ページが読み込むファイルに、行き先の無いものが1つも無い",
+              "meaning":"本番で画像やアニメが欠けない",
+              "detail":"ビルドが無いぶん、参照ミスはそのまま本番の404になる。人の目視ではなく機械で閉じる",
+              "criteria":[
+                { "text":"site/ 内の HTML/CSS/JS が参照する内部パスが全て実在する（リンク切れ0件）",
+                  "verify":"CI の site ジョブ内 `node scripts/check-site-assets.mjs` が exit 0。証拠はその run URL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-1-3", "kind":"state",
+              "theme":"静的配信したときに、トップページがちゃんと出る",
+              "meaning":"本番と同じ配り方で表示できる",
+              "detail":"本番(Cloudflare Pages)と同じ『静的ファイルをそのまま配る』形をCIで再現して確かめる",
+              "criteria":[
+                { "text":"site/ を静的配信すると / が 200 を返し、本文に『Kose Food AI』を含み、主要アセットも全て 200",
+                  "verify":"CI の site ジョブの配信スモーク（http.server → curl）が exit 0。証拠はその run URL",
+                  "evidence":"" }
+              ] }
+          ] },
+
+        { "id":"G-2", "kind":"state",
+          "theme":"そのサイトが、覚えられるURLでインターネットに出ている",
+          "meaning":"誰でも開ける状態になった",
+          "detail":"Cloudflare Pages に接続 → *.pages.dev で確認 → 独自ドメインを繋ぐ。DNSは既に Cloudflare なのでサブドメインのレコードは Pages 側が自動で作る（docs/site/DEPLOY.md 手順2〜3）",
+          "children":[
+            { "id":"G-2-1", "kind":"state",
+              "theme":"Cloudflare Pages がリポジトリを見て、自動で公開している",
+              "meaning":"push したら勝手に新しくなる仕組みができた",
+              "detail":"Build output directory は空欄ではなく site を指定する（/ にするとモノレポの中身まで配信されてしまう）。この操作はダッシュボードでの人手作業",
+              "criteria":[
+                { "text":"Pages プロジェクトが rahiseko-alt/ai-food-company に接続され、発行された *.pages.dev が 200 でサイトを表示する",
+                  "verify":"発行された *.pages.dev をブラウザとcurlで開いて 200 かつ本文に『Kose Food AI』。証拠はその公開URL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-2-2", "kind":"state",
+              "theme":"食べ物のサブドメイン food.kouheikosehira.com で開ける",
+              "meaning":"名刺やLINEに書けるURLになった",
+              "detail":"https 証明書は Cloudflare が自動発行。反映は数分〜最大1時間",
+              "criteria":[
+                { "text":"https://food.kouheikosehira.com が 200 を返し、本文に『Kose Food AI』を含む",
+                  "verify":"GitHub Actions の prod-smoke を手動実行（Actions → prod-smoke → Run workflow）し緑になること。証拠はその run URL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-2-3", "kind":"state",
+              "theme":"本番でも、絵とアニメと文字がちゃんと出てくる",
+              "meaning":"見た目が崩れていない",
+              "detail":"_headers による長期キャッシュが効くのもここ。差し替え時はファイル名変更かキャッシュパージが要る",
+              "criteria":[
+                { "text":"本番URLで CSS・JS・Lottie・壁紙が全て 200 で配信される",
+                  "verify":"prod-smoke の『公開アセットが 200』ステップが緑。証拠はその run URL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-2-4", "kind":"state",
+              "theme":"今までのサイトと会社のメールが、止まっていない",
+              "meaning":"新しいページを足して既存を壊していない",
+              "detail":"apex と www は Vercel の既存サイト、MX は Google Workspace。ここを触ると本業が止まる",
+              "criteria":[
+                { "text":"kouheikosehira.com の A レコードが生きており、MX が Google Workspace のままである",
+                  "verify":"prod-smoke の『既存サイト・メールが無傷であること』ステップ（dig 実測）が緑。証拠はその run URL",
+                  "evidence":"" }
+              ] }
+          ] },
+
+        { "id":"G-3", "kind":"state",
+          "theme":"相談フォームから送った内容が、実際にメールで届く",
+          "meaning":"問い合わせが取りこぼされない",
+          "detail":"送信先は FormSubmit 経由で info@kouheikosehira.com。公開直後に1回だけ有効化の手作業が要る（docs/site/DEPLOY.md 手順4）",
+          "children":[
+            { "id":"G-3-1", "kind":"state",
+              "theme":"フォームの初回有効化が済んでいる",
+              "meaning":"送っても届かない状態を抜けた",
+              "detail":"FormSubmit は初回送信で確認メールが来て、そのリンクを押すまで内容がメールにならない。押し忘れると『問い合わせが来ない』ではなく『来ているのに見えていない』事故になる",
+              "criteria":[
+                { "text":"本番フォームからのテスト送信が info@kouheikosehira.com に本文つきで届く",
+                  "verify":"本番の /#contact から実際に送信し、確認リンクを押した後にもう一度送って受信を確認する。証拠は FormSubmit の送信完了ページURL（または管理画面の該当URL）",
+                  "evidence":"" }
+              ] },
+            { "id":"G-3-2", "kind":"state",
+              "theme":"送った4項目が、欠けずにそのまま届く",
+              "meaning":"折り返す相手と用件が分かる",
+              "detail":"store（店名/会社名）・name（お名前）・contact（連絡先）・detail（困っていること）",
+              "criteria":[
+                { "text":"受信メールに store / name / contact / detail の4項目が入力どおり含まれる",
+                  "verify":"4項目に判別できるダミー値を入れて送信し、受信本文と突き合わせる。証拠はその送信の完了ページURL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-3-3", "kind":"state",
+              "theme":"メールアドレスが、そのままページに書かれていない",
+              "meaning":"迷惑メールの収集に拾われにくい",
+              "detail":"FormSubmit の別名エンドポイント（https://formsubmit.co/el/xxxxxx）に差し替えると隠せる。有効化(G-3-1)後でないと発行されないので後回しでよい",
+              "criteria":[
+                { "text":"[アドレス秘匿を採用する場合のみ] index.html の送信先が別名エンドポイントに置き換わり、生アドレスがHTMLに現れない",
+                  "verify":"公開HTMLを取得して `grep -c 'info@kouheikosehira.com'` が 0 かつフォーム送信が引き続き届く。証拠は差し替えコミットの SHA",
+                  "evidence":"" }
+              ] }
+          ] },
+
+        { "id":"G-4", "kind":"state",
+          "theme":"書いてあることが、実際にやることと食い違っていない",
+          "meaning":"読んだ人を裏切らない",
+          "detail":"公開した瞬間に、仮で置いた文言はすべて『お店の約束』として読まれる。docs/site/DEPLOY.md 手順5 の一覧が対象",
+          "children":[
+            { "id":"G-4-1", "kind":"state",
+              "theme":"相談の条件（無料・返信の速さ・時間・場所）が本当のことになっている",
+              "meaning":"約束できないことを約束していない",
+              "detail":"対象＝『初回相談は無料』『営業日24時間以内』『オンライン30分／来店・訪問(岐阜・愛知)』『概算費用、使える補助金までその場でお答えします』『お電話でも受け付けます(平日10:00–18:00)』",
+              "criteria":[
+                { "text":"上記の仮文言がマスターの確認を経て、実運用どおりの表記に確定している",
+                  "verify":"マスターが1件ずつ可否を回答し、その回答どおりに site/index.html を更新する。証拠はその更新コミットの SHA",
+                  "evidence":"" }
+              ] },
+            { "id":"G-4-2", "kind":"state",
+              "theme":"上のメニューを押したときに、押した先がある",
+              "meaning":"クリックして何も起きない不信感を作らない",
+              "detail":"現状『お問合せ ›』『ホーム』『よくある質問』はただの文字でリンクしていない。#contact へ繋ぐか、項目ごと削るかを決める",
+              "criteria":[
+                { "text":"ヘッダーの各項目が、リンクとして機能するか、または表示から削除されている",
+                  "verify":"本番HTMLで該当要素が a[href] を持つか、存在しないことを確認する。証拠は対応コミットの SHA",
+                  "evidence":"" }
+              ] },
+            { "id":"G-4-3", "kind":"state",
+              "theme":"LINEやSNSで共有したときに、画像つきで表示される",
+              "meaning":"共有されたときに見栄えが落ちない",
+              "detail":"OG画像（1200×630）が未支給。支給されるまでは着手しない（条件付き＝ゲート対象外）",
+              "criteria":[
+                { "text":"[OG画像が支給されたら] site/index.html に og:image が設定され、公開URLで画像が 200 で取得できる",
+                  "verify":"公開URLの og:image を取得して 200 かつ 1200×630。証拠は追加コミットの SHA",
+                  "evidence":"" }
+              ] }
+          ] }
+      ] }
   ]
 }
 </script>
