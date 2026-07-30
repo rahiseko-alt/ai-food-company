@@ -1,0 +1,415 @@
+/* =========================================================================
+   Kose Food AI — ヒーローオープニング + お品書き + 相談フォーム
+   Claude Design のプロトタイプ（Sanso Hero Opening.dc.html）を本番用に移植。
+   値はすべてプロトタイプのインラインスタイルと同一。clamp() による流体
+   スケーリングで PC〜SP を1系統で賄う（メディアクエリは使わない）。
+   ========================================================================= */
+
+/* --- 土台 ------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #F4EFE6 url('../art/paper.png') center center / cover no-repeat;
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: #B3241C; text-decoration: none; }
+a:hover { color: #EC0A1B; }
+
+.site { font-family: 'Josefin Sans', 'Zen Kaku Gothic New', sans-serif; }
+
+/* Zen Kaku Gothic New は和文用。欧文見出し・ロゴは Josefin Sans が受ける */
+.jp { font-family: 'Zen Kaku Gothic New', sans-serif; }
+
+/* --- 上部バー（.loaded＝11秒でフェードイン） -------------------------- */
+.header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: clamp(56px, 5.26vw, 76px);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(16px, 1.56vw, 30px);
+  /* 単色ではなく上→下のスクリム。紙の質感を透かしたまま文字位置の実効濃度を上げる */
+  background: linear-gradient(to bottom, rgba(18, 16, 14, 0.82), rgba(18, 16, 14, 0.44));
+  backdrop-filter: blur(10px);
+  color: #F4EFE6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+}
+.header__brand { display: flex; align-items: baseline; gap: 0.55em; font-weight: 700; line-height: 1; }
+.header__brand > span { font-size: clamp(16px, 1.15vw, 22px); letter-spacing: 0.06em; }
+.header__brand-ai { color: #EC0A1B; }
+/* ナビは中央ではなくお問合せボタンの隣に寄せる */
+.header__nav {
+  margin-left: auto; margin-right: clamp(14px, 1.46vw, 28px);
+  display: flex; gap: clamp(14px, 1.46vw, 28px);
+  font-size: clamp(11px, 0.78vw, 15px); font-weight: 700; letter-spacing: 0.04em;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+}
+.header__cta {
+  background: #EC0A1B; color: #F4EFE6;
+  padding: clamp(12px, 0.9vw, 17px) clamp(18px, 1.67vw, 32px);
+  font-weight: 700; letter-spacing: 0.1em; font-size: clamp(11px, 0.73vw, 14px); line-height: 1;
+}
+.header__cta:hover { color: #F4EFE6; }
+
+/* --- スクロール滑走路 ------------------------------------------------- */
+.runway { position: relative; height: 360svh; }
+
+.sticky {
+  position: sticky; top: 0; height: 100svh; overflow: hidden;
+  /* iOS Safari の慣性スクロール中のチラつき対策で合成レイヤーに追い出す */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  contain: layout paint;
+}
+
+.hero {
+  position: relative; height: 100%; min-height: 0;
+  background: #F4EFE6 url('../art/paper.png') center center / cover no-repeat;
+  overflow: hidden; z-index: 1;
+  transform-origin: 50% 46%;
+  will-change: transform;
+}
+
+/* --- 無限マーキー ----------------------------------------------------- */
+.marquee {
+  position: absolute; left: 0; right: 0;
+  color: rgba(26, 26, 26, 0.32);
+  font-size: clamp(84px, 9.6vw, 184px); line-height: 1.12; font-weight: 700;
+  white-space: nowrap; overflow: hidden; display: flex; pointer-events: none;
+}
+.marquee--top {
+  top: 0; padding-top: clamp(56px, 5.26vw, 76px); z-index: 2;
+  transform: translateY(-100%);
+}
+.marquee--bottom { bottom: 0; z-index: -1; transform: translateY(100%); }
+.marquee__slide {
+  display: flex; justify-content: center; align-items: center;
+  flex: 0 0 auto; list-style: none;
+}
+
+/* --- Lottie 描画枠 ---------------------------------------------------- */
+.hero__lottie {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; z-index: 1;
+}
+
+/* --- JSON が無いときの案内 -------------------------------------------- */
+.hero__missing {
+  position: absolute; inset: 0; z-index: 5;
+  display: none; place-items: center; text-align: center;
+  font-family: 'Zen Kaku Gothic New', sans-serif; padding: 6vw;
+}
+.hero__missing.is-visible { display: grid; }
+.hero__missing-box { max-width: 40em; display: grid; gap: 1em; }
+.hero__missing-title { font-size: clamp(18px, 1.8vw, 28px); font-weight: 700; letter-spacing: 0.04em; }
+.hero__missing-body { font-size: clamp(13px, 1.05vw, 17px); line-height: 2; opacity: 0.92; }
+.hero__missing-detail {
+  font-size: clamp(11px, 0.85vw, 13px); opacity: 0.7;
+  font-family: ui-monospace, monospace; line-height: 1.8;
+}
+
+/* --- コメントカード群（8.008s から0.281s間隔で立ち上がる） ------------ */
+.cards {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; flex-wrap: wrap;
+  align-items: flex-end; align-content: flex-end; justify-content: flex-start;
+  gap: clamp(7px, 1.1vw, 22px);
+  /* 右は SCROLL レールとの間隔を確保するため広めに取る */
+  padding: 0 clamp(52px, 5.5vw, 96px) clamp(12px, 2.2svh, 46px) clamp(20px, 2vw, 40px);
+  pointer-events: none;
+}
+.card {
+  padding: clamp(9px, 1.6svh, 24px) clamp(12px, 1.35vw, 26px) clamp(10px, 1.7svh, 26px);
+  background: #fff; color: #EC0A1B; border-radius: 2px;
+  box-shadow: 0 clamp(6px, 0.7vw, 14px) clamp(18px, 2vw, 38px) rgba(120, 70, 20, 0.18);
+  display: grid; gap: 0.7em; justify-items: start;
+  /* flex-grow は 0。単独行のカードが行幅いっぱいに伸びるのを防ぐ */
+  flex: 0 1 clamp(132px, 15vw, 300px); min-width: 0;
+  opacity: 0;
+}
+.card__rule { display: block; width: clamp(20px, 2.1vw, 40px); height: 2px; background: #EC0A1B; }
+.card__quote {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(12px, 1.25vw, 24px); line-height: 1.4; letter-spacing: 0.01em;
+  text-wrap: pretty;
+}
+.card__role {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 500;
+  font-size: clamp(10px, 0.83vw, 15px); letter-spacing: 0.06em; color: #2e2e2e;
+}
+
+.card--brand {
+  padding: clamp(11px, 1.8svh, 28px) clamp(14px, 1.56vw, 30px) clamp(10px, 1.6svh, 24px);
+  background: #2e2e2e; color: #fff;
+  box-shadow: 0 clamp(6px, 0.7vw, 14px) clamp(18px, 2vw, 38px) rgba(60, 40, 20, 0.3);
+  gap: 0.55em;
+  flex: 0 1 clamp(150px, 16vw, 320px);
+}
+.card--brand .card__name {
+  font-weight: 700; font-size: clamp(17px, 1.72vw, 33px);
+  letter-spacing: 0.04em; line-height: 1; white-space: nowrap;
+}
+.card--brand .card__sub {
+  font-size: clamp(10px, 0.86vw, 16px); font-weight: 400;
+  letter-spacing: 0.14em; color: #fff; white-space: nowrap;
+}
+
+/* --- SCROLL 誘導（.loaded でフェードイン、線は2秒周期で伸縮） --------- */
+.scrollhint {
+  position: absolute;
+  bottom: clamp(8px, 0.73vw, 14px); right: clamp(16px, 1.56vw, 30px);
+  width: clamp(14px, 1.35vw, 26px); height: clamp(88px, 22svh, 245px);
+  writing-mode: vertical-rl;
+  font-size: clamp(12px, 1.04vw, 20px); line-height: 1.7; color: #1A1A1A;
+  z-index: 3; opacity: 0;
+}
+.scrollhint__bar {
+  position: absolute; bottom: 0; left: 0; right: 0; margin: auto;
+  width: 1px; height: clamp(50px, 13svh, 140px);
+  background-color: #1A1A1A; display: block;
+}
+
+/* --- SKIP（10秒で消灯） ----------------------------------------------- */
+.skip { position: absolute; bottom: clamp(20px, 2.08vw, 40px); right: clamp(20px, 2.08vw, 40px); z-index: 4; }
+.skip__button {
+  display: flex; align-items: center; gap: 0.75em;
+  padding: 1em 1.6em 1em 2em; line-height: 1;
+  background: #1A1A1A; color: #F4EFE6; border: 0; cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 0.73vw, 14px); letter-spacing: 0.12em;
+}
+.skip__button:hover { background: #EC0A1B; color: #F4EFE6; }
+
+/* --- 幕・挨拶 --------------------------------------------------------- */
+.whiteout {
+  position: absolute; inset: 0; z-index: 20;
+  background: #F4EFE6 url('../art/paper.png') center center / cover no-repeat;
+  opacity: 0; pointer-events: none;
+}
+.greeting {
+  position: absolute; inset: 0; z-index: 21;
+  display: grid; place-items: center;
+  padding: 0 clamp(24px, 6vw, 120px);
+  opacity: 0; pointer-events: none;
+}
+.greeting img { width: clamp(280px, 52vw, 980px); height: auto; display: block; }
+/* 白紙フェード用の予備レイヤー。現在は apply() が常に opacity 0 を書く */
+.flash { position: absolute; inset: 0; z-index: 22; background: #F4EFE6; opacity: 0; pointer-events: none; }
+
+/* --- Menu（お品書き） -------------------------------------------------
+   margin-top: -100svh で runway 末尾に重ねる。p=1 で上端が画面最上部に一致。 */
+.menu {
+  position: relative; z-index: 2;
+  margin-top: calc(-1 * 100svh);
+  background: #F4EFE6 url('../art/paper.png') center center / cover no-repeat;
+  color: #1A1A1A;
+  padding: calc(clamp(56px, 5.26vw, 76px) + clamp(6px, 1.2vw, 28px)) clamp(20px, 3vw, 60px) clamp(8px, 1.2vw, 32px);
+  min-height: 100svh;
+  display: grid; align-content: center;
+}
+/* width:100% は必須。margin:0 auto だけでは grid アイテムが縮んで2カラム化しない */
+.menu__inner { width: 100%; max-width: 1180px; margin: 0 auto; display: grid; gap: clamp(16px, 2vw, 40px); }
+
+.menu__head { display: grid; justify-items: start; gap: clamp(6px, 0.9vw, 18px); text-align: left; }
+.rule { display: block; width: clamp(28px, 3vw, 56px); height: 3px; background: #B3241C; }
+.menu__eyebrow {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 0.85vw, 15px); letter-spacing: 0.22em; color: #B3241C;
+}
+.menu__title {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 46px); letter-spacing: 0.06em; line-height: 1.45;
+  color: #1A1A1A; max-width: 24em; text-wrap: pretty;
+}
+.menu__lead {
+  font-family: 'Zen Kaku Gothic New', sans-serif; max-width: 44em;
+  font-size: clamp(13px, 1.02vw, 18px); line-height: 1.85; color: #6B6156; text-wrap: pretty;
+}
+
+.menu__list { display: grid; gap: 0; justify-items: stretch; text-align: left; }
+.menu__listhead {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1em;
+  padding-bottom: clamp(6px, 0.7vw, 12px); border-bottom: 2px solid #B3241C;
+}
+.menu__listhead-label { font-weight: 700; font-size: clamp(13px, 1.1vw, 20px); letter-spacing: 0.14em; color: #1A1A1A; }
+.menu__listhead-note { font-size: clamp(11px, 0.85vw, 15px); letter-spacing: 0.06em; color: #6B6156; }
+
+.menu__row {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  display: grid; grid-template-columns: 1fr auto; align-items: baseline;
+  gap: 0 clamp(10px, 1.2vw, 22px); width: 100%;
+  padding: clamp(9px, 1vw, 16px) clamp(4px, 0.6vw, 12px);
+  min-height: 44px; border-bottom: 1px dotted #C9BCA4;
+}
+.menu__row:hover { background: #EFE7D8; }
+.menu__row-text { font-family: 'Zen Kaku Gothic New', sans-serif; display: grid; gap: 0.3em; }
+.menu__row-name {
+  font-weight: 700; font-size: clamp(16px, 1.4vw, 25px);
+  letter-spacing: 0.02em; line-height: 1.35; color: #1A1A1A;
+}
+.menu__row-desc { font-size: clamp(12px, 0.95vw, 16px); line-height: 1.6; color: #6B6156; text-wrap: pretty; }
+.menu__row-term {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(12px, 1vw, 18px); letter-spacing: 0.06em; color: #B3241C; white-space: nowrap;
+}
+
+/* --- Menu 内 CTA ------------------------------------------------------ */
+.callout {
+  display: grid; gap: clamp(10px, 1.2vw, 22px); justify-items: start;
+  padding: clamp(16px, 1.8vw, 34px);
+  border: 1px solid #C9BCA4; background: rgba(255, 255, 255, 0.42);
+}
+.callout__title {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(15px, 1.35vw, 24px); letter-spacing: 0.04em; line-height: 1.5; color: #1A1A1A;
+}
+.callout__body {
+  font-family: 'Zen Kaku Gothic New', sans-serif; max-width: 42em;
+  font-size: clamp(12px, 0.95vw, 16px); line-height: 1.8; color: #6B6156; text-wrap: pretty;
+}
+.callout__row { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(10px, 1.2vw, 20px); }
+.button--primary {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  background: #B3241C; color: #F4EFE6; font-weight: 700;
+  font-size: clamp(13px, 1vw, 17px); letter-spacing: 0.1em; line-height: 1;
+  padding: clamp(15px, 1.3vw, 22px) clamp(22px, 2.2vw, 40px);
+  min-height: 48px; display: inline-flex; align-items: center; text-decoration: none;
+}
+.button--primary:hover { background: #EC0A1B; color: #F4EFE6; }
+.callout__note {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(11px, 0.85vw, 15px); line-height: 1.7; color: #6B6156;
+}
+.menu__source {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(11px, 0.78vw, 13px); line-height: 1.75; color: #6B6156;
+}
+
+/* --- 相談セクション --------------------------------------------------- */
+.contact {
+  position: relative; z-index: 2;
+  scroll-margin-top: clamp(56px, 5.26vw, 76px);
+  background: #F4EFE6 url('../art/paper.png') center center / cover no-repeat;
+  color: #1A1A1A;
+  padding: clamp(48px, 6vw, 120px) clamp(20px, 3vw, 60px) clamp(56px, 6vw, 120px);
+}
+.contact__inner {
+  width: 100%; max-width: 1180px; margin: 0 auto;
+  display: grid; gap: clamp(24px, 3vw, 56px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+.contact__col { display: grid; justify-items: start; align-content: start; gap: clamp(10px, 1.2vw, 22px); }
+.contact__title {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(22px, 2.4vw, 42px); letter-spacing: 0.06em; line-height: 1.45;
+  color: #1A1A1A; max-width: 20em; text-wrap: pretty;
+}
+.contact__lead {
+  font-family: 'Zen Kaku Gothic New', sans-serif; max-width: 30em;
+  font-size: clamp(13px, 1vw, 17px); line-height: 1.9; color: #6B6156; text-wrap: pretty;
+}
+.contact__dl {
+  font-family: 'Zen Kaku Gothic New', sans-serif; display: grid; gap: 0.7em;
+  font-size: clamp(12px, 0.92vw, 16px); line-height: 1.7; color: #3A342C;
+}
+.contact__dl > div { display: flex; gap: 0.8em; }
+.contact__dl dt { color: #6B6156; min-width: 5.5em; }
+
+.form {
+  display: grid; gap: clamp(14px, 1.4vw, 24px);
+  padding: clamp(20px, 2.2vw, 40px);
+  border: 1px solid #C9BCA4; background: rgba(255, 255, 255, 0.42);
+}
+.form__label {
+  font-family: 'Zen Kaku Gothic New', sans-serif; display: grid; gap: 0.5em;
+  font-size: clamp(12px, 0.92vw, 16px); letter-spacing: 0.04em; color: #6B6156;
+}
+.form__input, .form__textarea {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(14px, 1vw, 17px); color: #1A1A1A;
+  background: rgba(255, 255, 255, 0.6); border: 1px solid #C9BCA4;
+}
+.form__input { line-height: 1.6; padding: 0.7em 0.9em; min-height: 48px; }
+.form__textarea { line-height: 1.7; padding: 0.75em 0.9em; resize: vertical; }
+.form__submit {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  background: #B3241C; color: #F4EFE6; font-weight: 700;
+  font-size: clamp(13px, 1vw, 17px); letter-spacing: 0.1em; line-height: 1;
+  padding: clamp(16px, 1.4vw, 24px); min-height: 48px; text-align: center;
+}
+.form__submit:hover { background: #EC0A1B; }
+.form__submit:focus-visible { outline: 2px solid #1A1A1A; outline-offset: 2px; }
+.form__submit[aria-disabled="true"] { background: #8C7F72; cursor: default; }
+
+/* 入力チェック。エラーが無いときは何も出ないので見た目は変わらない */
+.form__input:focus-visible, .form__textarea:focus-visible { outline: 2px solid #B3241C; outline-offset: 1px; }
+.form__input[aria-invalid="true"], .form__textarea[aria-invalid="true"] { border-color: #B3241C; }
+.form__error {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 0.82vw, 14px); line-height: 1.6; color: #B3241C;
+}
+.form__status {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(12px, 0.92vw, 16px); line-height: 1.8;
+  padding: clamp(10px, 1vw, 16px) clamp(12px, 1.1vw, 18px);
+  border: 1px solid #C9BCA4; background: rgba(255, 255, 255, 0.6); color: #3A342C;
+}
+.form__status[data-tone="ok"] { border-color: #B3241C; color: #1A1A1A; }
+.form__status[data-tone="ng"] { border-color: #B3241C; background: rgba(179, 36, 28, 0.06); color: #8E1D16; }
+.form__note {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(11px, 0.78vw, 13px); line-height: 1.7; color: #6B6156;
+}
+
+/* --- 品名 → 全画面の詳細 ---------------------------------------------
+   z-index は常時表示のヘッダー(9999)より上。下だと閉じるボタンがバーに覆われる。 */
+.detail {
+  position: fixed; inset: 0; z-index: 10050;
+  background: #F4EFE6 url('../art/paper.png') center center / cover no-repeat;
+  display: none; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.detail.is-open { display: block; }
+.detail__inner { min-height: 100%; display: grid; grid-template-rows: auto 1fr; align-content: start; }
+.detail__bar {
+  position: sticky; top: 0;
+  background: rgba(244, 239, 230, 0.94); backdrop-filter: blur(6px);
+  border-bottom: 1px solid #DCD2BF;
+  padding: clamp(14px, 1.4vw, 26px) clamp(20px, 2.4vw, 48px);
+  display: flex; justify-content: flex-start;
+}
+.detail__close {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  display: flex; align-items: center; gap: 0.6em;
+  font-weight: 700; font-size: clamp(12px, 0.95vw, 17px); letter-spacing: 0.1em;
+  color: #B3241C; padding: 0.7em 1.1em; border: 1px solid #B3241C;
+}
+.detail__close:hover { background: #B3241C; color: #F4EFE6; }
+
+.detail__panel {
+  display: none; max-width: 46em; margin: 0 auto;
+  padding: clamp(28px, 3vw, 60px) clamp(20px, 2.4vw, 48px) clamp(34px, 3.6vw, 72px);
+}
+.detail__panel.is-active { display: block; }
+.detail__title {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(24px, 2.9vw, 52px); letter-spacing: 0.03em; line-height: 1.35; color: #1A1A1A;
+}
+.detail__meta { display: flex; align-items: center; gap: 0.8em; margin: clamp(16px, 1.8vw, 34px) 0; }
+.detail__meta-rule { display: block; width: clamp(24px, 2.6vw, 48px); height: 2px; background: #B3241C; }
+.detail__meta-label {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(12px, 1vw, 18px); letter-spacing: 0.08em; color: #B3241C;
+}
+.detail__body {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(15px, 1.15vw, 21px); line-height: 2.1; letter-spacing: 0.02em;
+  color: #3A342C; text-wrap: pretty;
+}

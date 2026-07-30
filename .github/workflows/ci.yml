@@ -97,19 +97,74 @@ jobs:
 
           echo "SMOKE OK: HTTP 200 かつ本文に 'cc-v2 monorepo' を確認"
 
+  site:
+    name: 静的サイト検査 (内部参照 + 配信スモーク)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      # Cloudflare Pages はビルドを挟まないので、参照ミスはそのまま本番の 404 になる。
+      - name: 内部参照リンタ (site/ にリンク切れが無い)
+        run: node scripts/check-site-assets.mjs
+
+      # 本番と同じ「静的ファイルをそのまま配信する」形で 200 と本文マーカーを外部事実として取る。
+      - name: 配信スモーク (static serve → curl 200 + 'Kose Food AI' + 全アセット200)
+        run: |
+          python3 -m http.server 8777 --bind 127.0.0.1 --directory site &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          ready=0
+          for i in $(seq 1 15); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8777/ || true)
+            if [ "$code" = "200" ]; then ready=1; break; fi
+            sleep 1
+          done
+          if [ "$ready" != "1" ]; then
+            echo "FAIL: 静的配信が 200 を返しませんでした (last code: ${code:-none})"
+            exit 1
+          fi
+
+          if ! curl -sf http://127.0.0.1:8777/ | grep -q 'Kose Food AI'; then
+            echo "FAIL: 本文にマーカー 'Kose Food AI' がありません"
+            exit 1
+          fi
+
+          # index が参照する内部アセットが実配信でも全て 200 であること。
+          fail=0
+          for p in assets/css/site.css assets/js/hero.js assets/js/contact.js \
+                   assets/vendor/gsap.min.js assets/vendor/CustomEase.min.js assets/vendor/lottie.min.js \
+                   assets/lottie/hero.json assets/lottie/hero-sp.json \
+                   assets/art/paper.png assets/art/greeting-ink.png; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8777/${p}")
+            echo "${code} ${p}"
+            [ "$code" = "200" ] || fail=1
+          done
+          if [ "$fail" != "0" ]; then
+            echo "FAIL: 200 を返さないアセットがあります"
+            exit 1
+          fi
+
+          echo "SITE SMOKE OK: index 200 + マーカー + 全アセット 200"
+
   # 集約ゲート＝branch protection が要求する「安定した1つの必須チェック」。
   # 内部ジョブ(quality/smoke)の名前や中身が変わっても context 名は 'ci-green' で不変。
   # scripts/setup.sh はこの 'ci-green' と 'roadmap-required' だけを必須指定する。
   gate:
     name: ci-green
-    needs: [quality, smoke]
+    needs: [quality, smoke, site]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: 上流ジョブが全て success か検査（1つでも失敗/スキップなら赤）
         run: |
-          if [ "${{ needs.quality.result }}" != "success" ] || [ "${{ needs.smoke.result }}" != "success" ]; then
-            echo "ci-green: FAIL (quality=${{ needs.quality.result }} smoke=${{ needs.smoke.result }})"
+          if [ "${{ needs.quality.result }}" != "success" ] || [ "${{ needs.smoke.result }}" != "success" ] || [ "${{ needs.site.result }}" != "success" ]; then
+            echo "ci-green: FAIL (quality=${{ needs.quality.result }} smoke=${{ needs.smoke.result }} site=${{ needs.site.result }})"
             exit 1
           fi
-          echo "ci-green: OK（quality / smoke ともに success）"
+          echo "ci-green: OK（quality / smoke / site すべて success）"

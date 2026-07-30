@@ -1,52 +1,70 @@
 name: prod-smoke
 
-# 本番到達の外部事実チェック（G-2-2）。
-# 実行環境(サンドボックス)は *.vercel.app への外向きが遮断されるため、
-# プロキシ外の実機である GitHub Actions に本番URLを curl させて機械判定する。
-# この run が緑＝「公開URLが 200 かつ本文に 'cc-v2 monorepo'」の evidence。
+# 本番到達の外部事実チェック。
+# 実行環境(サンドボックス)は外向きが遮断されるため、プロキシ外の実機である
+# GitHub Actions に本番URLを curl させて機械判定する。
+# この run が緑＝「公開URLが 200 かつ本文に 'Kose Food AI'」の evidence。
+#
+# 手動実行のみ（workflow_dispatch）にしてある理由：
+# Cloudflare Pages への接続とカスタムドメイン設定は人の手作業なので、
+# それが済むまで push のたびに赤くなる（＝オオカミ少年になる）ため。
+# 公開が済んだら Actions タブから 1 回まわし、その run URL を
+# docs/roadmap.html の evidence に貼る。常時監視に切り替えたくなったら
+# 下の schedule/push トリガーを足す。
 on:
-  push:
-    branches: ["**"]
   workflow_dispatch:
 
-# 本番URL（Vercel production alias）。プロジェクトのドメインが変わったらここを更新。
+# 本番URL。ドメインが変わったらここを更新する。
 env:
-  PROD_URL: "https://cc-v2-web.vercel.app"
+  PROD_URL: "https://food.kouheikosehira.com"
 
 jobs:
   reachable:
     name: prod 200 + marker
     runs-on: ubuntu-latest
     steps:
-      - name: curl production (200 かつ 'cc-v2 monorepo') — G-2-2
+      - name: curl production (200 かつ 'Kose Food AI') — G-2-2
         run: |
           echo "Checking ${PROD_URL}"
-          code=$(curl -sS -o body.html -w '%{http_code}' --max-time 30 "${PROD_URL}")
+          code=$(curl -sS -L -o body.html -w '%{http_code}' --max-time 30 "${PROD_URL}")
           echo "HTTP=${code}"
           if [ "${code}" != "200" ]; then
             echo "FAIL: 期待 200 に対し ${code}"
             exit 1
           fi
-          if ! grep -q 'cc-v2 monorepo' body.html; then
-            echo "FAIL: 本文にマーカー 'cc-v2 monorepo' が無い"
+          if ! grep -q 'Kose Food AI' body.html; then
+            echo "FAIL: 本文にマーカー 'Kose Food AI' が無い"
             exit 1
           fi
-          echo "PROD OK: 200 かつ 'cc-v2 monorepo' を ${PROD_URL} で確認"
+          echo "PROD OK: 200 かつ 'Kose Food AI' を ${PROD_URL} で確認"
 
-      - name: HSTS ヘッダを確認 — G-3-3 c2
+      - name: 公開アセットが 200 で配信されている — G-2-3
         run: |
-          # 本番が https かつ Strict-Transport-Security を返すこと（外部事実）。
-          hdrs=$(curl -sSI --max-time 30 "${PROD_URL}")
-          echo "${hdrs}"
-          if ! printf '%s' "${hdrs}" | grep -iq '^strict-transport-security:'; then
-            echo "FAIL: 応答に Strict-Transport-Security ヘッダが無い（main へ反映後に緑になる）"
+          fail=0
+          for p in assets/css/site.css assets/js/hero.js assets/lottie/hero.json assets/art/paper.png; do
+            code=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "${PROD_URL}/${p}")
+            echo "${code} ${p}"
+            [ "${code}" = "200" ] || fail=1
+          done
+          test "${fail}" = "0"
+          echo "ASSETS OK: 主要アセットが本番で 200"
+
+      - name: 既存サイト・メールが無傷であること — G-2-4
+        run: |
+          # apex / www は Vercel の既存サイト、MX は Google Workspace。
+          # サブドメイン追加でこれらを壊していないことを DNS の実測で確かめる。
+          echo "--- apex / www ---"
+          apex=$(dig +short kouheikosehira.com A | tr '\n' ' ')
+          www=$(dig +short www.kouheikosehira.com A CNAME | tr '\n' ' ')
+          echo "apex=${apex}"
+          echo "www=${www}"
+          if [ -z "${apex}" ]; then echo "FAIL: apex の A レコードが消えている"; exit 1; fi
+
+          echo "--- MX (Google Workspace) ---"
+          mx=$(dig +short kouheikosehira.com MX | tr '\n' ' ')
+          echo "mx=${mx}"
+          if ! printf '%s' "${mx}" | grep -q 'google.com'; then
+            echo "FAIL: MX に Google Workspace が見当たらない（メールが止まる）"
             exit 1
           fi
-          echo "HSTS OK: Strict-Transport-Security を確認"
-
-      - name: ヘルスチェック /api/health が 200 — G-4-1 裏打ち
-        run: |
-          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "${PROD_URL}/api/health")
-          echo "HTTP(/api/health)=${code}"
-          test "${code}" = "200"
-          echo "HEALTH OK: /api/health が 200"
+          echo "DNS OK: 既存サイトの A と Google Workspace の MX は無傷"
