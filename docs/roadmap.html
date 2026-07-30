@@ -120,7 +120,7 @@
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
     "active": "G-4-1",
-    "next": "公開は完了。残るは文言と導線の確定。まず G-4-1＝相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認し、確定した表記で site/index.html を更新する。次に G-4-2（ヘッダーの「お問合せ ›」「ホーム」「よくある質問」が未リンク）。G-4-3（OG画像）は支給待ち。G-3-1/G-3-2 は実運用で届くことをマスターが確認済みだが、機械が検算できる外部事実が無いため evidence は空のまま。",
+    "next": "公開は完了。残るは文言と導線の確定。まず G-4-1＝相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認し、確定した表記で site/index.html を更新する。次に G-4-2（ヘッダーの「お問合せ ›」「ホーム」「よくある質問」が未リンク）。G-4-3（OG画像）は支給待ち。G-3-1/G-3-2 は実運用で届くことをマスターが確認済みだが、機械が検算できる外部事実が無いため evidence は空のまま。次回サイトの構成・訴求を見直す際は docs/site/recommended-pattern.md（飲食コンサル29社の実地調査から出した推奨。確信度つき）を先に読むこと。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
@@ -145,8 +145,8 @@
       "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。",
-      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。埋めるなら FormSubmit の送信完了ページURL等が要ります。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。"
+      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。⑦飲食コンサル29社（AI/IT/従来型の3軸）の実地HP構成調査を実施し、docs/site/research-competitor-hp.md（監査用一覧表つき生データ）と docs/site/recommended-pattern.md（確信度つきの次回リニューアル推奨）を追加。調査中、母数の重複（3社を2軸で二重計上）と、件数を数えずに『デリシャスノーツのみ』『空白地帯』と書いた誤りをマスターの指摘で発見し、全項目を29社基準で数え直して訂正済み。",
+      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。埋めるなら FormSubmit の送信完了ページURL等が要ります。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。④競合HP調査で、3軸のサブエージェントが独立に候補を選んだ結果、同じ会社（ダイニー・トレタ・スリーウェル）を2軸で重複計上し、件数を数え直さずに『AIを具体的に語るのはデリシャスノーツのみ』『LINE CTAは空白地帯』と断定してマスターに報告した。数え直すと前者は0/29社、後者は3/29社が正しく、実質を過大に一般化していた。"
     },
     "updated": "2026-07-30"
   },
