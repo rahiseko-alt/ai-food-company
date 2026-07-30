@@ -7,56 +7,50 @@ Claude Design のプロトタイプ（`Sanso Hero Opening.dc.html`）を本番�
 
 ## ローカルで開く
 
-`hero.json` を fetch するため **`file://` では動かない**（HTTP 配信が必須）。
+Lottieを取得するため **`file://` では動かない**（HTTP 配信が必須）。
 
 ```sh
-python3 -m http.server 8777 --directory site
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
-ブラウザで <http://127.0.0.1:8777/> を開く。
+ブラウザで <http://127.0.0.1:4173/> を開く。
 
 ## スタック（この案件の確定事項）
 
 | 項目 | 値 |
 |---|---|
 | ホスティング | Cloudflare Pages（Build output directory = `site`） |
-| 言語 / ランタイム | 素の HTML / CSS / JavaScript（ビルドなし・Node 不要） |
+| 言語 / ランタイム | 素の HTML / CSS / JavaScript（公開ビルドなし。品質検査は Node 22） |
 | フレームワーク | 無し。アニメーションのみ GSAP 3.13.0 ＋ lottie-web 5.12.2（CDN ではなく同梱） |
-| パッケージ管理 | 無し（依存を同梱しているため） |
+| パッケージ管理 | pnpm 10.33.0（品質ツールのみ。公開時のJS依存は同梱） |
 | DB / 認証 | 無し |
 | フォーム送信 | FormSubmit（外部サービス。送信先 `info@kouheikosehira.com`） |
 | DNS | Cloudflare（`kouheikosehira.com`）。apex/www は Vercel の既存サイト、MX は Google Workspace |
-| CI | GitHub Actions。`ci.yml` の `site` ジョブ（内部参照リンタ＋配信スモーク）と、手動実行の `prod-smoke.yml` |
-| Lint / テスト | `scripts/check-site-assets.mjs`（内部参照リンタ）＋ 静的配信スモーク |
+| CI | GitHub Actions。lint、単体、Playwright、axe、監査、契約検査と、手動の本番スモーク |
+| Lint / テスト | ESLint、Stylelint、HTML Validate、Node test、Playwright、axe-core |
 
 ## 構成
 
 | パス | 中身 |
 |---|---|
-| `site/index.html` | 全画面（ヒーロー／お品書き／詳細パネル／相談フォーム） |
-| `site/assets/css/site.css` | スタイル。clamp() による流体スケーリングで PC〜SP を1系統で賄う |
-| `site/assets/js/hero.js` | GSAP マスタータイムライン、Lottie スクラブ、スクロール連動、詳細パネル |
-| `site/assets/js/contact.js` | 相談フォームの送信（FormSubmit へ ajax POST） |
+| `site/index.html` | 全画面（ヒーロー／お品書き／詳細ダイアログ／相談フォーム） |
+| `site/assets/css/site.css` | スタイルと明示的なレスポンシブ指定 |
+| `site/assets/js/main.mjs` | ブラウザ側の小さな起動入口 |
+| `site/assets/js/*.mjs` | オープニング、Lottie、スクロール、詳細、フォームの独立機能 |
 | `site/assets/lottie/` | `hero.json`（PC）/ `hero-sp.json`（SP）。767px 境界で切替 |
 | `site/assets/art/` | 壁紙 `paper.png`、「いらっしゃいませ！」`greeting-ink.png` |
 | `site/assets/vendor/` | GSAP 3.13.0 / CustomEase / lottie-web 5.12.2（CDN ではなく同梱） |
 | `site/_headers` | Cloudflare Pages のキャッシュ／セキュリティヘッダー設定 |
-| `scripts/build-site-single.py` | 配布用に1枚の自己完結HTMLへ焼き固めるツール（公開サイトには使わない） |
 | `scripts/check-site-assets.mjs` | `site/` の内部参照リンタ（CI が実行。リンク切れ＝本番404 を機械で弾く） |
+| `scripts/check-lottie-contract.mjs` | スマホLottieの固定位置を守る契約検査 |
 
-## つまみ
-
-`site/assets/js/hero.js` 冒頭の `CONFIG` で切り替える。
-
-- `showSkip` — 右下の SKIP ボタン
-- `showScrollHint` — 右下の SCROLL 誘導
-- `openingSpeed` — オープニングの再生速度（1 = 12.045s）
+日常の変更箇所は [`MAINTENANCE.md`](./MAINTENANCE.md) を参照。
 
 ## 変更したときのチェック
 
 ```sh
-node scripts/check-site-assets.mjs             # 内部参照にリンク切れが無いか
-python3 -m http.server 8777 --directory site   # 実際に配信して目で見る
+pnpm run check
 ```
 
-同じ内容を CI（`.github/workflows/ci.yml` の `site` ジョブ）が機械で回している。
+同じ検査を CI（`.github/workflows/ci.yml`）でも実行する。

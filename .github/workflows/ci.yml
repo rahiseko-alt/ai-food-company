@@ -1,15 +1,20 @@
 name: CI
 
-# 機械の審判（machine judge）。ロードマップ G-1 系の evidence は
-# このワークフローの run URL / commit SHA を指す（AI の自己申告を証拠にしない）。
 on:
   push:
     branches: ["**"]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
-    name: typecheck / lint / test / build
+    name: references / lint / unit / audit / roadmap
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,29 +30,29 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
 
-      - name: Install (frozen lockfile)
+      - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm -r typecheck
+      - name: Check internal references
+        run: pnpm run verify:references
 
-      - name: Lint
-        run: pnpm -r lint
+      - name: Check Lottie contract
+        run: pnpm run verify:lottie
 
-      - name: Test
-        run: pnpm -r test
+      - name: Lint HTML, CSS, and JavaScript
+        run: pnpm run lint
 
-      - name: Build
-        run: pnpm -r build
+      - name: Run Node unit tests
+        run: pnpm run test:unit
 
-      - name: Audit (fail on moderate+)
-        run: pnpm audit --audit-level moderate
+      - name: Audit dependencies
+        run: pnpm run audit
 
-      - name: Verify roadmap evidence (外部事実のみ)
-        run: node scripts/verify-roadmap-evidence.mjs
+      - name: Verify roadmap evidence
+        run: pnpm run verify:roadmap
 
-  smoke:
-    name: 起動スモーク (build → start → curl 200 + marker)
+  browser:
+    name: Playwright / axe
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,108 +68,42 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
 
-      - name: Install (frozen lockfile)
+      - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm -r build
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
 
-      # 到達性を外部事実(HTTP 200＋本文マーカー)で縛る。スクショにしない。
-      - name: Smoke (next start → curl 200 + 'cc-v2 monorepo')
-        run: |
-          pnpm --filter web start &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+      - name: Run browser tests
+        run: pnpm run test:e2e
 
-          # 起動待ち（最大60秒）
-          ready=0
-          for i in $(seq 1 30); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000 || true)
-            if [ "$code" = "200" ]; then ready=1; break; fi
-            sleep 2
-          done
-          if [ "$ready" != "1" ]; then
-            echo "FAIL: server did not return 200 within timeout (last code: ${code:-none})"
-            exit 1
-          fi
+      - name: Run accessibility tests
+        run: pnpm run test:a11y
 
-          # 本文に既知マーカーを含むこと
-          body=$(curl -sf http://localhost:3000)
-          if ! printf '%s' "$body" | grep -q 'cc-v2 monorepo'; then
-            echo "FAIL: body did not contain marker 'cc-v2 monorepo'"
-            exit 1
-          fi
-
-          echo "SMOKE OK: HTTP 200 かつ本文に 'cc-v2 monorepo' を確認"
-
-  site:
-    name: 静的サイト検査 (内部参照 + 配信スモーク)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Upload browser artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          node-version-file: .node-version
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
-      # Cloudflare Pages はビルドを挟まないので、参照ミスはそのまま本番の 404 になる。
-      - name: 内部参照リンタ (site/ にリンク切れが無い)
-        run: node scripts/check-site-assets.mjs
-
-      # 本番と同じ「静的ファイルをそのまま配信する」形で 200 と本文マーカーを外部事実として取る。
-      - name: 配信スモーク (static serve → curl 200 + 'Kose Food AI' + 全アセット200)
-        run: |
-          python3 -m http.server 8777 --bind 127.0.0.1 --directory site &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-
-          ready=0
-          for i in $(seq 1 15); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8777/ || true)
-            if [ "$code" = "200" ]; then ready=1; break; fi
-            sleep 1
-          done
-          if [ "$ready" != "1" ]; then
-            echo "FAIL: 静的配信が 200 を返しませんでした (last code: ${code:-none})"
-            exit 1
-          fi
-
-          if ! curl -sf http://127.0.0.1:8777/ | grep -q 'Kose Food AI'; then
-            echo "FAIL: 本文にマーカー 'Kose Food AI' がありません"
-            exit 1
-          fi
-
-          # index が参照する内部アセットが実配信でも全て 200 であること。
-          fail=0
-          for p in assets/css/site.css assets/js/hero.js assets/js/contact.js \
-                   assets/vendor/gsap.min.js assets/vendor/CustomEase.min.js assets/vendor/lottie.min.js \
-                   assets/lottie/hero.json assets/lottie/hero-sp.json \
-                   assets/art/paper.png assets/art/greeting-ink.png; do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8777/${p}")
-            echo "${code} ${p}"
-            [ "$code" = "200" ] || fail=1
-          done
-          if [ "$fail" != "0" ]; then
-            echo "FAIL: 200 を返さないアセットがあります"
-            exit 1
-          fi
-
-          echo "SITE SMOKE OK: index 200 + マーカー + 全アセット 200"
-
-  # 集約ゲート＝branch protection が要求する「安定した1つの必須チェック」。
-  # 内部ジョブ(quality/smoke)の名前や中身が変わっても context 名は 'ci-green' で不変。
-  # scripts/setup.sh はこの 'ci-green' と 'roadmap-required' だけを必須指定する。
   gate:
     name: ci-green
-    needs: [quality, smoke, site]
+    needs: [quality, browser]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: 上流ジョブが全て success か検査（1つでも失敗/スキップなら赤）
+      - name: Require every quality job
+        env:
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
         run: |
-          if [ "${{ needs.quality.result }}" != "success" ] || [ "${{ needs.smoke.result }}" != "success" ] || [ "${{ needs.site.result }}" != "success" ]; then
-            echo "ci-green: FAIL (quality=${{ needs.quality.result }} smoke=${{ needs.smoke.result }} site=${{ needs.site.result }})"
+          if [ "$QUALITY_RESULT" != "success" ] || [ "$BROWSER_RESULT" != "success" ]; then
+            echo "ci-green: FAIL (quality=$QUALITY_RESULT browser=$BROWSER_RESULT)"
             exit 1
           fi
-          echo "ci-green: OK（quality / smoke / site すべて success）"
+          echo "ci-green: OK"

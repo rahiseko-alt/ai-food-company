@@ -119,8 +119,8 @@
   "meta": {
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
-    "active": "G-4-1",
-    "next": "公開は完了。残るは文言と導線の確定。まず G-4-1＝相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認し、確定した表記で site/index.html を更新する。次に G-4-2（ヘッダーの「お問合せ ›」「ホーム」「よくある質問」が未リンク）。G-4-3（OG画像）は支給待ち。G-3-1/G-3-2 は実運用で届くことをマスターが確認済みだが、機械が検算できる外部事実が無いため evidence は空のまま。次回サイトの構成・訴求を見直す際は docs/site/recommended-pattern.md（飲食コンサル29社の実地調査から出した推奨。確信度つき）を先に読むこと。",
+    "active": "G-5-9",
+    "next": "G-5-1〜G-5-9のローカル実装と独立検証は完了。push/PRは別段階のため、明示指示後にGitHub Actionsのci-green URLをG-5 evidenceへ記録し、本番スモークを実行する。その後はG-4-1の未確定文言確認へ戻る。criteria/verifyは2026-07-30のユーザー承認済み計画から変更していない。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
@@ -129,7 +129,7 @@
         "q4": "未確認。現時点の根拠はマスター自身の飲食20年の実務経験（逸話）であり、見込み客への聞き取りや反証探しは行っていない。＝ goal-gate.md の3分岐でいう『仮説のまま進める』状態。反証は公開後の問い合わせ件数で取る。",
         "q5": "理想経路＝サイトを開く→オープニングで『何者か』が伝わる→お品書きで自分の困りごとに当たるメニューを見つける→相談フォームに店名・名前・連絡先・困りごとを入れて送る→返信が来る。失敗経路＝(a)フォーム送信が届かない(FormSubmit 未有効化)、(b)スマホで重い/崩れる、(c)仮の文言（初回相談無料・24時間以内返信等）が実運用と食い違い、期待外れで信用を落とす。",
         "q6": "やらないこと＝(1)予約・決済・会員機能（相談を受けるだけの1枚に絞る）、(2)CMS/管理画面（更新は git で行う）、(3)ブログ・事例記事（コンテンツ供給が続かないため今回外す）、(4)独自メールフォーム基盤（FormSubmit に寄せる）。いずれもゴールになり得たが、初期の目的は『相談が届くこと』1点なので外した。",
-        "q7": "納品形態＝Cloudflare Pages で https://food.kouheikosehira.com/ に公開された静的サイト。ソースは rahiseko-alt/ai-food-company の site/ 配下。引き継ぎ先＝マスター本人（更新は git push で自動再公開）。公開手順とハマりどころは docs/site/DEPLOY.md。",
+        "q7": "納品形態＝Cloudflare Pages で https://food.kouheikosehira.com/ に公開された静的サイト。ソースは rahiseko-alt/kose-food-ai-hp の site/ 配下。引き継ぎ先＝マスター本人（更新は git push で自動再公開）。公開手順とハマりどころは docs/site/DEPLOY.md。",
         "q8": "作れる。実測で確認済み＝(a)ドメインのネームサーバーは Cloudflare、food サブドメインは未使用なので既存サイト(Vercel の apex/www)とメール(Google Workspace の MX)に触らず載せられる、(b)静的ファイルのみでビルド不要、(c)ローカル配信で index と全アセットが 200 を返すことを確認済み。未確認＝Cloudflare ダッシュボードの操作とフォーム初回有効化は人手が必要で、AI 側からは実行できない（API トークン無し／api.cloudflare.com へ到達不可）。"
       },
       "checks": {
@@ -145,8 +145,8 @@
       "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。⑦飲食コンサル29社（AI/IT/従来型の3軸）の実地HP構成調査を実施し、docs/site/research-competitor-hp.md（監査用一覧表つき生データ）と docs/site/recommended-pattern.md（確信度つきの次回リニューアル推奨）を追加。調査中、母数の重複（3社を2軸で二重計上）と、件数を数えずに『デリシャスノーツのみ』『空白地帯』と書いた誤りをマスターの指摘で発見し、全項目を29社基準で数え直して訂正済み。",
-      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。埋めるなら FormSubmit の送信完了ページURL等が要ります。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。④競合HP調査で、3軸のサブエージェントが独立に候補を選んだ結果、同じ会社（ダイニー・トレタ・スリーウェル）を2軸で重複計上し、件数を数え直さずに『AIを具体的に語るのはデリシャスノーツのみ』『LINE CTAは空白地帯』と断定してマスターに報告した。数え直すと前者は0/29社、後者は3/29社が正しく、実質を過大に一般化していた。"
+      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。⑦飲食コンサル29社（AI/IT/従来型の3軸）の実地HP構成調査を実施し、docs/site/research-competitor-hp.md（監査用一覧表つき生データ）と docs/site/recommended-pattern.md（確信度つきの次回リニューアル推奨）を追加。⑧G-5安定化を実装し、スマホ筆文字固定、通常フロー、状態管理、フォールバック、5画面レスポンシブ、native dialog、フォーム多重送信防止、静的サイト一本化、実ブラウザCIを追加。Node 22 / pnpm 10.33.0で参照・Lottie・lint・単体6件・E2E24件・axe5画面・moderate監査・roadmap検査をローカル通過。独立検証者が回転連打・読込中SKIP・bfcacheの3競合を発見し、再現テストと修正後の再監査で全件解消を確認。",
+      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。埋めるなら FormSubmit の送信完了ページURL等が要ります。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。④G-5はローカル検査済みだが未pushであり、外部事実となるCI run URLがまだ無い。criteriaのevidenceは自己申告で埋めず、明示指示後のpushとci-green完了まで空欄を維持する。⑤Playwrightの初回実行はChromium未導入で起動前に失敗したため、固定環境で導入後に全件再実行した。4 workerではLottie同時描画負荷でdialog試験が不安定化したため、CIとローカルを2 workerへ統一し、同じ受入条件で再実行して緑を確認した。"
     },
     "updated": "2026-07-30"
   },
@@ -178,7 +178,7 @@
               "criteria":[
                 { "text":"site/ 内の HTML/CSS/JS が参照する内部パスが全て実在する（リンク切れ0件）",
                   "verify":"CI の site ジョブ内 `node scripts/check-site-assets.mjs` が exit 0。証拠はその run URL",
-                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30512688163" }
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30512688163" }
               ] },
             { "id":"G-1-3", "kind":"state",
               "theme":"静的配信したときに、トップページがちゃんと出る",
@@ -187,7 +187,7 @@
               "criteria":[
                 { "text":"site/ を静的配信すると / が 200 を返し、本文に『Kose Food AI』を含み、主要アセットも全て 200",
                   "verify":"CI の site ジョブの配信スモーク（http.server → curl）が exit 0。証拠はその run URL",
-                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30512688163" }
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30512688163" }
               ] }
           ] },
 
@@ -201,7 +201,7 @@
               "meaning":"push したら勝手に新しくなる仕組みができた",
               "detail":"Build output directory は空欄ではなく site を指定する（/ にするとモノレポの中身まで配信されてしまう）。この操作はダッシュボードでの人手作業",
               "criteria":[
-                { "text":"Pages プロジェクトが rahiseko-alt/ai-food-company に接続され、発行された *.pages.dev が 200 でサイトを表示する",
+                { "text":"Pages プロジェクトが rahiseko-alt/kose-food-ai-hp に接続され、Cloudflareプロジェクト ai-food-company の *.pages.dev が 200 でサイトを表示する",
                   "verify":"発行された *.pages.dev をブラウザとcurlで開いて 200 かつ本文に『Kose Food AI』。証拠はその公開URL",
                   "evidence":"https://ai-food-company.pages.dev" }
               ] },
@@ -212,7 +212,7 @@
               "criteria":[
                 { "text":"https://food.kouheikosehira.com が 200 を返し、本文に『Kose Food AI』を含む",
                   "verify":"GitHub Actions の prod-smoke を手動実行（Actions → prod-smoke → Run workflow）し緑になること。証拠はその run URL",
-                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30513706224" }
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30513706224" }
               ] },
             { "id":"G-2-3", "kind":"state",
               "theme":"本番でも、絵とアニメと文字がちゃんと出てくる",
@@ -221,7 +221,7 @@
               "criteria":[
                 { "text":"本番URLで CSS・JS・Lottie・壁紙が全て 200 で配信される",
                   "verify":"prod-smoke の『公開アセットが 200』ステップが緑。証拠はその run URL",
-                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30513706224" }
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30513706224" }
               ] },
             { "id":"G-2-4", "kind":"state",
               "theme":"今までのサイトと会社のメールが、止まっていない",
@@ -230,7 +230,7 @@
               "criteria":[
                 { "text":"kouheikosehira.com の A レコードが生きており、MX が Google Workspace のままである",
                   "verify":"prod-smoke の『既存サイト・メールが無傷であること』ステップ（dig 実測）が緑。証拠はその run URL",
-                  "evidence":"https://github.com/rahiseko-alt/ai-food-company/actions/runs/30513706224" }
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30513706224" }
               ] }
           ] },
 
@@ -298,6 +298,94 @@
               "criteria":[
                 { "text":"[OG画像が支給されたら] site/index.html に og:image が設定され、公開URLで画像が 200 で取得できる",
                   "verify":"公開URLの og:image を取得して 200 かつ 1200×630。証拠は追加コミットの SHA",
+                  "evidence":"" }
+              ] }
+          ] },
+
+        { "id":"G-5", "kind":"state",
+          "theme":"今後どこを変えても、別の場所が連鎖して壊れず、壊れたら公開前に分かる",
+          "meaning":"サイトを安心して変更し続けられる",
+          "detail":"2026-07-30にユーザーが承認した安定化・一本化計画。見た目と約12秒の演出は維持し、公開対象は静的サイト1つへ絞る",
+          "children":[
+            { "id":"G-5-1", "kind":"state",
+              "theme":"スマホの最後の筆文字が、最初に現れた低い位置から上へ動かない",
+              "meaning":"『飲食20年×AIで…』が一瞬ずれない",
+              "detail":"hero-sp.json の最終筆文字2レイヤーを初期位置 Y=444.781 / Y=432 に固定する。PC版は変えない",
+              "criteria":[
+                { "text":"スマホLottieのフレーム246から265で、最終筆文字2レイヤーのY座標が初期値から変化しない",
+                  "verify":"`node scripts/check-lottie-contract.mjs` がレイヤー名・静的位置・初期Y座標を検査して exit 0",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-2", "kind":"state",
+              "theme":"お品書きと本文が、オープニングの都合で移動させられていない",
+              "meaning":"演出を直しても本文位置が狂わない",
+              "detail":"負の100svh marginとmenu/menu__innerのJS transformを禁止し、通常フローへ戻す",
+              "criteria":[
+                { "text":"お品書きは通常フローにあり、menuとmenu__innerのcomputed transformが全スクロール位置でnone",
+                  "verify":"PlaywrightでPC/SPの開始・中間・終了位置をスクロールし、transform=noneとDOM順の通常配置を検査",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-3", "kind":"state",
+              "theme":"見えない要素が、SKIPやキーボード操作を奪わない",
+              "meaning":"見えているものを確実に押せる",
+              "detail":"透明なメニューがヒーロー上へ逆移動していたため、クリックとTabの対象を実表示と一致させる",
+              "criteria":[
+                { "text":"オープニング中、SKIP中央の最前面要素がSKIPボタンであり、非表示要素はTab順に入らない",
+                  "verify":"PlaywrightでPC/SPのelementFromPointとTab移動を検査",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-4", "kind":"state",
+              "theme":"アニメ素材やJavaScriptが失敗しても、本文と相談導線を使える",
+              "meaning":"演出の故障でサイト全体が止まらない",
+              "detail":"基本状態を表示済みにし、依存/Lottie失敗・タイムアウト・reduced-motion・hash直アクセスをフォールバックさせる",
+              "criteria":[
+                { "text":"Lottieまたは演出依存を取得できない場合も、ヘッダー・お品書き・相談フォームが表示され操作できる",
+                  "verify":"Playwrightで対象リクエストを失敗させ、本文表示・#contact到達・スクロール解禁を検査",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-5", "kind":"state",
+              "theme":"小さいスマホから大きいPCまで、主要要素が重ならず読める",
+              "meaning":"画面サイズを変えても崩れない",
+              "detail":"320/390/768/1024/1440幅を受入対象にする",
+              "criteria":[
+                { "text":"指定5画面幅で横あふれ・ヘッダー重なり・操作要素の文字切れがない",
+                  "verify":"Playwrightで320x568、390x844、768x1024、1024x768、1440x900を検査",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-6", "kind":"state",
+              "theme":"詳細画面を閉じると、元の品目へ操作位置が戻る",
+              "meaning":"キーボードでも迷子にならない",
+              "detail":"ネイティブdialogで背景操作、Escape、フォーカス復帰を一つにまとめる",
+              "criteria":[
+                { "text":"詳細表示中は背景を操作できず、Escapeまたは閉じる操作後に開いた品目へフォーカスが戻る",
+                  "verify":"Playwrightで背景スクロール・Tab循環・Escape・復帰先を検査",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-7", "kind":"state",
+              "theme":"相談フォームを連打しても、同じ内容が二重送信されない",
+              "meaning":"問い合わせを重複させない",
+              "detail":"送信中フラグ、disabled、15秒タイムアウト、成功応答確認を持たせる",
+              "criteria":[
+                { "text":"クリックとEnterを重ねても通信は1回だけで、失敗時は入力を保持して再送できる",
+                  "verify":"Playwrightの通信スタブで成功・4xx/5xx・異常JSON・タイムアウト・多重操作を検査",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-8", "kind":"state",
+              "theme":"公開するコードと検査対象が、静的サイト1つに揃っている",
+              "meaning":"使っていない別アプリに判断を迷わされない",
+              "detail":"apps/packages/Next.js用設定とテンプレ用自動化を削除し、site/を唯一の公開対象にする",
+              "criteria":[
+                { "text":"ルートの開発・lint・test・CIがsite/だけを対象とし、未使用アプリやダミーbuildを含まない",
+                  "verify":"package scriptsとCIジョブを検査し、`pnpm lint`、`pnpm test:unit`、`pnpm test:e2e`がsite向け実検査として通る",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-9", "kind":"state",
+              "theme":"画面の動作不良を、公開前の自動検査が見つけられる",
+              "meaning":"目視だけに頼らず再発を止める",
+              "detail":"構文・参照・HTTP 200だけでなく、実ブラウザ操作とアクセシビリティをCIへ入れる",
+              "criteria":[
+                { "text":"CIがlint・単体・実ブラウザ・アクセシビリティ・脆弱性・roadmap検査を全て実行する",
+                  "verify":"GitHub Actionsのci-greenが全ジョブ成功し、証拠はrun URL",
                   "evidence":"" }
               ] }
           ] }

@@ -128,7 +128,6 @@ function main() {
   {
     const WHITE = 0, GRAY = 1, BLACK = 2;
     const color = new Map();
-    const cyclePath = [];
     let cycleFound = null;
     const dfs = (id, stack) => {
       if (cycleFound) return;

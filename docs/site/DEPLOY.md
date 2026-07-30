@@ -1,11 +1,11 @@
 # 公開手順（Cloudflare Pages）
 
 - **公開先** … `https://food.kouheikosehira.com/`
+- **GitHub** … `rahiseko-alt/kose-food-ai-hp`
+- **Cloudflare Pages のプロジェクト名** … `ai-food-company`
 - **リポジトリ内の場所** … 配信するファイルは **`site/`** に置いてある
   （`site/index.html` ＋ `site/assets/` ＋ `site/_headers`）。`site/` の外にあるものは公開されない。
-- **配信するもの** … 分割版（`index.html` ＋ `assets/`）。単一HTML（`dist/index.html`）は
-  プレビュー配布用で公開サイトには使わない — 分割版のほうが資産を個別にキャッシュでき、
-  Lottie も PC/SP のどちらか一方しか読み込まないため軽い
+- **配信するもの** … `site/` の静的ファイル一式。ビルドや単一HTMLへの変換は行わない
 
 ## 調べて確定していること（2026-07-30 時点のDNS実測）
 
@@ -25,7 +25,7 @@ DNSがすでに Cloudflare なので、サブドメインのレコードは Page
 
 Cloudflare Pages は GitHub リポジトリを見て自動公開する。
 
-配信ファイルは `rahiseko-alt/ai-food-company` の `site/` に入っている。
+配信ファイルは `rahiseko-alt/kose-food-ai-hp` の `site/` に入っている。
 プルリクエストを `main` にマージした時点で、この手順に進める状態になる。
 
 ```sh
@@ -35,12 +35,12 @@ git push -u origin <作業ブランチ>
 
 ---
 
-## 2. Cloudflare Pages を作る
+## 2. Cloudflare Pages の接続を確認する
 
 1. <https://dash.cloudflare.com/> にログイン（`kouheikosehira.com` があるアカウント）
-2. **Workers & Pages → Create → Pages → Connect to Git**
-3. `rahiseko-alt/ai-food-company` を選ぶ
-4. ビルド設定は**すべて空**にする（ビルド不要の静的サイト）
+2. **Workers & Pages → `ai-food-company`** を開く
+3. Git接続先が `rahiseko-alt/kose-food-ai-hp` であることを確認する
+4. ビルド設定を次の値にする（ビルド不要の静的サイト）
 
    | 項目 | 値 |
    |---|---|
@@ -51,9 +51,9 @@ git push -u origin <作業ブランチ>
    | Production branch | `main` |
 
    ⚠ **Build output directory を `site` にすること**。`/`（リポジトリ直下）にすると
-   モノレポの中身（`AGENTS.md` や `docs/`）まで配信されてしまう。
+   リポジトリ内の運用ファイル（`AGENTS.md` や `docs/`）まで配信されてしまう。
 
-5. **Save and Deploy** → `xxxxx.pages.dev` が発行される。ここで実機表示を一度確認
+5. **Save and Deploy** 後、PagesのURLで実機表示を一度確認する
 
 ---
 
@@ -139,20 +139,6 @@ Pages の **Deployments → Manage → Purge cache** を実行するか、ファ
 
 ---
 
-## 補足：プレビュー用の単一HTML
-
-1ファイルで配りたいとき（サーバ無しで開かせたいとき）はこちら。
-
-```sh
-python3 scripts/build-site-single.py -o dist/index.html \
-  --fonts-css <@font-faceのCSS> --fonts-dir <woff2の置き場> --fonts-used <使用リスト.json>
-```
-
-`--fonts-*` を省くと Google Fonts を参照する形になる（HTTP配信なら問題ないが、
-外部通信が禁じられた場所では書体が端末標準に落ちる）。
-
----
-
 ## 7. 公開できたことを機械で確かめる
 
 自己申告ではなく外部事実で確かめる。GitHub の **Actions → prod-smoke → Run workflow** を実行する。
@@ -161,7 +147,8 @@ python3 scripts/build-site-single.py -o dist/index.html \
 | 検査 | 内容 |
 |---|---|
 | prod 200 + marker | `https://food.kouheikosehira.com` が 200 で、本文に `Kose Food AI` を含む |
-| 公開アセット | CSS / JS / Lottie / 壁紙が本番で 200 |
+| 公開アセット | CSS / ES Modules / Lottie / 壁紙が本番で 200 |
+| フォーム導線 | 問い合わせ欄と送信フォームが公開HTMLに存在する |
 | DNS 無傷 | apex の A レコードが生きていて、MX が Google Workspace のまま |
 
 緑になった **run の URL** を `docs/roadmap.html` の該当 criteria の `evidence` に貼る。
