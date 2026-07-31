@@ -2,7 +2,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const useFocusedProject = (testInfo, project = 'mobile-390') => {
-  test.skip(testInfo.project.name !== project, `Covered once in ${project}`);
+  const covered = Array.isArray(project) ? project : [project];
+  test.skip(!covered.includes(testInfo.project.name), `Covered in ${covered.join(' / ')}`);
 };
 
 test('responsive layout keeps content in normal flow', async ({ page }) => {
@@ -52,8 +53,10 @@ test('responsive layout keeps content in normal flow', async ({ page }) => {
   ]);
 });
 
+// G-5-3 の verify は「PC/SP の elementFromPoint と Tab 移動」を求めているので、
+// スマホ幅だけでなくPC幅でも実行する。
 test('SKIP is frontmost, idempotent, and unlocks scrolling', async ({ page }, testInfo) => {
-  useFocusedProject(testInfo);
+  useFocusedProject(testInfo, ['mobile-390', 'desktop-1024']);
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('data-opening-state', 'playing');
 
