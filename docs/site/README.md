@@ -49,7 +49,11 @@ pnpm run dev
 
 ## 変更したときのチェック
 
+`check` には Playwright と axe が含まれる。初回だけブラウザ本体の導入が要る
+（入れずに走らせると、検査が始まる前に落ちる）。
+
 ```sh
+pnpm exec playwright install chromium
 pnpm run check
 ```
 

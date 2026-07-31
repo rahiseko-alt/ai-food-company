@@ -229,6 +229,24 @@ export class OpeningController {
       return;
     }
     if (request !== this.resizeRequest) return;
+
+    // 取りこぼしの自己修復。
+    // 差し替え中は loader.animation が一時的に null になるため、その間に届いた
+    // リサイズは上のガードで捨てられる。捨てられたまま止まると、最後の幅と実際に
+    // 載っている版が食い違ったままになる（例：スマホ幅なのにPC版のまま）。
+    // ここで最終的な幅と突き合わせ、食い違っていたら一度だけ合わせ直す。
+    if (this.loader.animation && this.loader.isMobile(window.innerWidth) !== this.loader.mobile) {
+      try {
+        await this.loader.switchForWidth(window.innerWidth);
+      } catch (error) {
+        if (request !== this.resizeRequest) return;
+        console.error('[opening resize reconcile]', error);
+        this.fail();
+        return;
+      }
+      if (request !== this.resizeRequest) return;
+    }
+
     const shouldResume = this.resumeAfterResize;
     this.resumeAfterResize = false;
     if (shouldResume && ['playing', 'skipping'].includes(this.state)) this.timeline.play();
