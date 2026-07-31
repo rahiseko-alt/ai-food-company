@@ -41,13 +41,20 @@ jobs:
       - name: 公開アセットが 200 で配信されている — G-2-3
         run: |
           fail=0
-          for p in assets/css/site.css assets/js/hero.js assets/lottie/hero.json assets/art/paper.png; do
+          for p in assets/css/site.css assets/js/main.mjs assets/lottie/hero.json assets/lottie/hero-sp.json assets/art/paper.png; do
             code=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "${PROD_URL}/${p}")
             echo "${code} ${p}"
             [ "${code}" = "200" ] || fail=1
           done
           test "${fail}" = "0"
           echo "ASSETS OK: 主要アセットが本番で 200"
+
+      - name: 問い合わせ導線が公開されている
+        run: |
+          curl -sS -L --max-time 30 "${PROD_URL}" -o body.html
+          grep -q 'id="contact"' body.html
+          grep -q '<form' body.html
+          echo "CONTACT OK: 問い合わせ欄とフォームを確認"
 
       - name: 既存サイト・メールが無傷であること — G-2-4
         run: |

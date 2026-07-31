@@ -19,7 +19,7 @@
 <link rel="icon" href="data:," />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&amp;family=Zen+Kaku+Gothic+New:wght@500;700&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/css/site.css" />
 
@@ -28,19 +28,18 @@
 <script src="assets/vendor/CustomEase.min.js"></script>
 <script src="assets/vendor/lottie.min.js"></script>
 </head>
-<body>
+<body id="top">
 
 <div class="site" data-hero="root">
 
   <header class="header" data-hero="header">
-    <div class="header__brand">
+    <a class="header__brand" href="#top" aria-label="Kose Food AI ホーム">
       <span>Kose Food <span class="header__brand-ai">AI</span></span>
-    </div>
-    <nav class="header__nav">
-      <span>ホーム</span><span>よくある質問</span>
+    </a>
+    <nav class="header__nav" aria-label="主要メニュー">
+      <a href="#top">ホーム</a>
     </nav>
-    <!-- TODO: 遷移先未確定。#contact へリンクするかは要確認（デザイン時点では非リンク） -->
-    <div class="header__cta">お問合せ ›</div>
+    <a class="header__cta" href="#contact">お問合せ ›</a>
   </header>
 
   <div class="runway" data-hero="runway">
@@ -58,17 +57,6 @@
         </div>
 
         <div class="hero__lottie" data-hero="lottie"></div>
-
-        <div class="hero__missing" data-hero="missing">
-          <div class="hero__missing-box">
-            <div class="hero__missing-title">hero.json / hero-sp.json が見つかりません</div>
-            <div class="hero__missing-body">
-              この2ファイルを <code>assets/lottie/</code> に置いてください。<br />
-              GSAP と lottie-web は読み込み済みで、置かれた時点で 12.045s のオープニングが走ります。
-            </div>
-            <div class="hero__missing-detail" data-hero="missingdetail"></div>
-          </div>
-        </div>
 
         <div class="cards" data-hero="cards">
 
@@ -116,11 +104,10 @@
         <img src="assets/art/greeting-ink.png" alt="いらっしゃいませ！" />
       </div>
 
-      <div class="flash" data-hero="flash"></div>
     </div>
   </div>
 
-  <section class="menu" data-hero="menu" aria-label="お品書き">
+  <section class="menu" aria-label="お品書き">
     <div class="menu__inner">
 
       <div class="menu__head">
@@ -136,69 +123,93 @@
           <span class="menu__listhead-note">押すと中身が開きます／目安期間</span>
         </div>
 
-        <button type="button" class="menu__row" data-menu="1">
-          <span class="menu__row-text">
-            <span class="menu__row-name">現場診断</span>
-            <span class="menu__row-desc">一日ぶん張り付いて、時間とお金がどこで漏れているかを店ごとに洗い出す。</span>
-          </span>
-          <span class="menu__row-term">3日</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">現場診断</span>
+              <span class="menu__row-desc">一日ぶん張り付いて、時間とお金がどこで漏れているかを店ごとに洗い出す。</span>
+            </span>
+            <span class="menu__row-term">3日</span>
+          </button>
+          <template data-menu-detail>厨房とホールに立ち、実際の動きを見る。POSの履歴、シフト表、発注書を預かって数字にする。何が詰まっているかを紙1枚にして返す。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="2">
-          <span class="menu__row-text">
-            <span class="menu__row-name">業務の棚卸し</span>
-            <span class="menu__row-desc">人がやらなくていい仕事と、人がやるべき仕事を仕分ける。ここが効き方を決める。</span>
-          </span>
-          <span class="menu__row-term">1週</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">業務の棚卸し</span>
+              <span class="menu__row-desc">人がやらなくていい仕事と、人がやるべき仕事を仕分ける。ここが効き方を決める。</span>
+            </span>
+            <span class="menu__row-term">1週</span>
+          </button>
+          <template data-menu-detail>毎日の作業を全部書き出し、人がやるべきものと機械に渡せるものに分ける。渡せるものだけを次の工程に送る。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="3">
-          <span class="menu__row-text">
-            <span class="menu__row-name">AIシフト作成</span>
-            <span class="menu__row-desc">客数予測と希望シフトから原案を生成。月20時間かかっていた作業を1時間に。</span>
-          </span>
-          <span class="menu__row-term">2週</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">AIシフト作成</span>
+              <span class="menu__row-desc">客数予測と希望シフトから原案を生成。月20時間かかっていた作業を1時間に。</span>
+            </span>
+            <span class="menu__row-term">2週</span>
+          </button>
+          <template data-menu-detail>希望休、スキル、売上予測を入れると原案が出る。店長は直すだけ。作成にかけていた時間がほぼ消える。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="4">
-          <span class="menu__row-text">
-            <span class="menu__row-name">AI需要予測と発注</span>
-            <span class="menu__row-desc">曜日・天気・予約から必要量を出す。廃棄と欠品を、勘ではなく数字で減らす。</span>
-          </span>
-          <span class="menu__row-term">3週</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">AI需要予測と発注</span>
+              <span class="menu__row-desc">曜日・天気・予約から必要量を出す。廃棄と欠品を、勘ではなく数字で減らす。</span>
+            </span>
+            <span class="menu__row-term">3週</span>
+          </button>
+          <template data-menu-detail>天気、曜日、近隣の催事、過去の実績から翌日の客数を出す。発注量が自動で決まるので、迷いと廃棄が同時に減る。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="5">
-          <span class="menu__row-text">
-            <span class="menu__row-name">セルフオーダー導入</span>
-            <span class="menu__row-desc">注文取りをお客様側に渡し、ホール一人分の手を接客と仕込みに戻す。</span>
-          </span>
-          <span class="menu__row-term">2週</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">セルフオーダー導入</span>
+              <span class="menu__row-desc">注文取りをお客様側に渡し、ホール一人分の手を接客と仕込みに戻す。</span>
+            </span>
+            <span class="menu__row-term">2週</span>
+          </button>
+          <template data-menu-detail>注文を客席に渡す。ホールは料理を運び、話をすることに時間を戻せる。伝票の打ち間違いもなくなる。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="6">
-          <span class="menu__row-text">
-            <span class="menu__row-name">電話予約のAI代行</span>
-            <span class="menu__row-desc">営業中の電話で接客が止まらない。取りこぼした予約も一次対応で拾う。</span>
-          </span>
-          <span class="menu__row-term">1週</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">電話予約のAI代行</span>
+              <span class="menu__row-desc">営業中の電話で接客が止まらない。取りこぼした予約も一次対応で拾う。</span>
+            </span>
+            <span class="menu__row-term">1週</span>
+          </button>
+          <template data-menu-detail>営業中の電話を機械が受ける。空席を見て予約を確定し、台帳に書き込む。手が止まらない。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="7">
-          <span class="menu__row-text">
-            <span class="menu__row-name">口コミ返信の自動化</span>
-            <span class="menu__row-desc">返信の下書きを当日中に用意。評価は放置した分だけ落ちる。</span>
-          </span>
-          <span class="menu__row-term">5日</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">口コミ返信の自動化</span>
+              <span class="menu__row-desc">返信の下書きを当日中に用意。評価は放置した分だけ落ちる。</span>
+            </span>
+            <span class="menu__row-term">5日</span>
+          </button>
+          <template data-menu-detail>投稿を拾って下書きを作る。店の言葉づかいを覚えさせるので、そのまま出せる文が上がってくる。</template>
+        </div>
 
-        <button type="button" class="menu__row" data-menu="8">
-          <span class="menu__row-text">
-            <span class="menu__row-name">月次の数字報告会</span>
-            <span class="menu__row-desc">入れた仕組みが回っているかを毎月見て、外すもの・足すものを決める。</span>
-          </span>
-          <span class="menu__row-term">毎月</span>
-        </button>
+        <div class="menu__item">
+          <button type="button" class="menu__row" data-menu>
+            <span class="menu__row-text">
+              <span class="menu__row-name">月次の数字報告会</span>
+              <span class="menu__row-desc">入れた仕組みが回っているかを毎月見て、外すもの・足すものを決める。</span>
+            </span>
+            <span class="menu__row-term">毎月</span>
+          </button>
+          <template data-menu-detail>入れて終わりにしない。毎月、効いた数字と効かなかった数字を並べて次の一手を決める。</template>
+        </div>
       </div>
 
       <div class="callout">
@@ -262,7 +273,7 @@
         <label class="form__label">
           <span>連絡先（メール または 電話）</span>
           <input class="form__input" type="text" name="contact" placeholder="例：080-0000-0000"
-                 required autocomplete="email tel" />
+                 required autocomplete="email" />
           <span class="form__error" data-error-for="contact" hidden></span>
         </label>
         <label class="form__label">
@@ -278,91 +289,25 @@
     </div>
   </section>
 
-  <div class="detail" data-hero="detail" role="dialog" aria-modal="true" aria-label="お品書きの詳細">
+  <dialog class="detail" data-hero="detail" aria-labelledby="detail-title">
     <div class="detail__inner">
       <div class="detail__bar">
         <button type="button" class="detail__close" data-hero="detailclose">
           <span aria-hidden="true">‹</span> Menuに戻る
         </button>
       </div>
-      <div>
-        <article class="detail__panel" data-detail="1">
-          <h3 class="detail__title">現場診断</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 3日</span>
-          </div>
-          <p class="detail__body">厨房とホールに立ち、実際の動きを見る。POSの履歴、シフト表、発注書を預かって数字にする。何が詰まっているかを紙1枚にして返す。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="2">
-          <h3 class="detail__title">業務の棚卸し</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 1週</span>
-          </div>
-          <p class="detail__body">毎日の作業を全部書き出し、人がやるべきものと機械に渡せるものに分ける。渡せるものだけを次の工程に送る。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="3">
-          <h3 class="detail__title">AIシフト作成</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 2週</span>
-          </div>
-          <p class="detail__body">希望休、スキル、売上予測を入れると原案が出る。店長は直すだけ。作成にかけていた時間がほぼ消える。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="4">
-          <h3 class="detail__title">AI需要予測と発注</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 3週</span>
-          </div>
-          <p class="detail__body">天気、曜日、近隣の催事、過去の実績から翌日の客数を出す。発注量が自動で決まるので、迷いと廃棄が同時に減る。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="5">
-          <h3 class="detail__title">セルフオーダー導入</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 2週</span>
-          </div>
-          <p class="detail__body">注文を客席に渡す。ホールは料理を運び、話をすることに時間を戻せる。伝票の打ち間違いもなくなる。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="6">
-          <h3 class="detail__title">電話予約のAI代行</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 1週</span>
-          </div>
-          <p class="detail__body">営業中の電話を機械が受ける。空席を見て予約を確定し、台帳に書き込む。手が止まらない。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="7">
-          <h3 class="detail__title">口コミ返信の自動化</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 5日</span>
-          </div>
-          <p class="detail__body">投稿を拾って下書きを作る。店の言葉づかいを覚えさせるので、そのまま出せる文が上がってくる。</p>
-        </article>
-
-        <article class="detail__panel" data-detail="8">
-          <h3 class="detail__title">月次の数字報告会</h3>
-          <div class="detail__meta">
-            <span class="detail__meta-rule"></span>
-            <span class="detail__meta-label">目安 毎月</span>
-          </div>
-          <p class="detail__body">入れて終わりにしない。毎月、効いた数字と効かなかった数字を並べて次の一手を決める。</p>
-        </article>
-      </div>
+      <article class="detail__panel">
+        <h3 class="detail__title" id="detail-title" data-detail-title>お品書き詳細</h3>
+        <div class="detail__meta">
+          <span class="detail__meta-rule"></span>
+          <span class="detail__meta-label">目安 <span data-detail-term></span></span>
+        </div>
+        <p class="detail__body" data-detail-body></p>
+      </article>
     </div>
-  </div>
+  </dialog>
 </div>
 
-<script src="assets/js/hero.js"></script>
-<script src="assets/js/contact.js"></script>
+<script type="module" src="assets/js/main.mjs"></script>
 </body>
 </html>

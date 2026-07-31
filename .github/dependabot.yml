@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # pnpm workspace（apps/*, packages/*）はロックファイルがルート1つなので "/" 指定で全体をカバーする
+  # 静的サイト用の品質ツールはルート package.json だけで管理する。
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
