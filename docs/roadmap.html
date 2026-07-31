@@ -119,8 +119,8 @@
   "meta": {
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
-    "active": "G-5-9",
-    "next": "G-5-1〜G-5-9のローカル実装と独立検証は完了。push/PRは別段階のため、明示指示後にGitHub Actionsのci-green URLをG-5 evidenceへ記録し、本番スモークを実行する。その後はG-4-1の未確定文言確認へ戻る。criteria/verifyは2026-07-30のユーザー承認済み計画から変更していない。",
+    "active": "G-5-10",
+    "next": "G-5-1〜G-5-11をこのブランチへ載せた。ci-greenが緑になったらそのrun URLをG-5系のevidenceへ記録し、mainへマージしてから本番スモークを実行する。その後はG-4-1の未確定文言（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金／電話は平日10:00-18:00）をマスターに1件ずつ確認する作業へ戻る。G-4-2はヘッダーの「ホーム」「お問合せ」がリンク済みになったため、残るは「よくある質問」を出すか消すかの判断のみ。G-3-1/G-3-2はフォーム実装がcontact.jsからcontact-controller.mjsへ全面的に入れ替わったため、マージ後に本番で実送信の受信確認をやり直すこと。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
@@ -145,10 +145,10 @@
       "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。⑦飲食コンサル29社（AI/IT/従来型の3軸）の実地HP構成調査を実施し、docs/site/research-competitor-hp.md（監査用一覧表つき生データ）と docs/site/recommended-pattern.md（確信度つきの次回リニューアル推奨）を追加。⑧G-5安定化を実装し、スマホ筆文字固定、通常フロー、状態管理、フォールバック、5画面レスポンシブ、native dialog、フォーム多重送信防止、静的サイト一本化、実ブラウザCIを追加。Node 22 / pnpm 10.33.0で参照・Lottie・lint・単体6件・E2E24件・axe5画面・moderate監査・roadmap検査をローカル通過。独立検証者が回転連打・読込中SKIP・bfcacheの3競合を発見し、再現テストと修正後の再監査で全件解消を確認。",
-      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。埋めるなら FormSubmit の送信完了ページURL等が要ります。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。④G-5はローカル検査済みだが未pushであり、外部事実となるCI run URLがまだ無い。criteriaのevidenceは自己申告で埋めず、明示指示後のpushとci-green完了まで空欄を維持する。⑤Playwrightの初回実行はChromium未導入で起動前に失敗したため、固定環境で導入後に全件再実行した。4 workerではLottie同時描画負荷でdialog試験が不安定化したため、CIとローカルを2 workerへ統一し、同じ受入条件で再実行して緑を確認した。"
+      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。⑦飲食コンサル29社（AI/IT/従来型の3軸）の実地HP構成調査を実施し、docs/site/research-competitor-hp.md（監査用一覧表つき生データ）と docs/site/recommended-pattern.md（確信度つきの次回リニューアル推奨）を追加。⑧G-5安定化を実装し、スマホ筆文字固定、通常フロー、状態管理、フォールバック、5画面レスポンシブ、native dialog、フォーム多重送信防止、静的サイト一本化、実ブラウザCIを追加。Node 22 / pnpm 10.33.0で参照・Lottie・lint・単体6件・E2E24件・axe5画面・moderate監査・roadmap検査をローカル通過。独立検証者が回転連打・読込中SKIP・bfcacheの3競合を発見し、再現テストと修正後の再監査で全件解消を確認。⑨そのPR#14を別セッションで独立レビューし、実画面5サイズ（320/390/768/1024/1440）とmainとの対照実験で重大な表示退行を1件確認した。767pxの境界をまたぐとヒーローのLottieが消え、幅を戻しても復活しない（スマホの回転で再現）。原因はlottie-loader.mjsで新しい絵を載せてから古い絵をdestroyしていたことで、lottie-webのdestroy()がコンテナを丸ごと空にするため新しい絵まで消えていた。順序を入れ替えて修正し、境界またぎ後もSVGが残ることを検査するE2Eを2本追加した（G-5-10）。⑩あわせてAGENTS.mdを統合し直し、mainにあった規律5節（案件の絶対起点・普遍ルール・検証の規律・PR instructions・セッション開始の儀式）を復元、テンプレ運用固有の4節は削除したまま、削除済みパスへの参照を0件にした。規律節の生存を守る単体テストも追加した（G-5-11）。",
+      "trouble": "①Cloudflare のダッシュボード操作は AI 側から実行できませんでした（トークン無し。api.cloudflare.com も dash.cloudflare.com も pages.dev もプロキシで遮断＝CONNECT 403）。表示確認と操作はすべてマスターの手作業で、AI 側の確認は GitHub Actions（プロキシ外の実機）経由に限られます。②そのため G-3-1/G-3-2（フォームが届く）は、マスターが実際の受信を確認して成立しているものの、機械が検算できる外部事実が無く evidence は空のままです。③ゴール定義ゲートは前回に続き goal-drafter / basis-reviewer の二枚を通せておらず、judged_by は「未（マスター承認待ち）」のままです。④独立レビューで、CIが11チェックすべて緑にもかかわらず重大な表示退行を1件発見した（G-5-10。詳細は docs/failures.md 2026-07-31）。CI緑は「壊れていない証明」ではないことを再確認した。⑤同レビューで、AGENTS.md から検証の規律・セッション開始の儀式・原子ツリー・PR規約が意図せず削除されていることも発見した（G-5-11）。サイトの整理とルールの整理を同じPRで混ぜたことが原因。⑥レビュー環境ではfonts.googleapis.comへ到達できず（ERR_CONNECTION_RESET）初期表示に約13秒かかり、実時間の固定予算に依存したE2E 3件が偽の赤になった。計測して環境要因と切り分けた。E2Eが実時間予算に依存している点は未解決の弱さとして残る。"
     },
-    "updated": "2026-07-30"
+    "updated": "2026-07-31"
   },
   "nodes": [
     { "id":"G", "kind":"state",
@@ -386,6 +386,24 @@
               "criteria":[
                 { "text":"CIがlint・単体・実ブラウザ・アクセシビリティ・脆弱性・roadmap検査を全て実行する",
                   "verify":"GitHub Actionsのci-greenが全ジョブ成功し、証拠はrun URL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-10", "kind":"state",
+              "theme":"スマホを回しても、ヒーローの筆文字が消えない",
+              "meaning":"端末を持ち替えただけで看板が消える事故を止める",
+              "detail":"767pxの境界をまたぐとスマホ用とPC用のLottieを差し替える。lottie-webのdestroy()は自分のコンテナを丸ごと空にするため、新しい絵を載せてから古い絵を消すと新しい絵まで巻き込んで消える。必ず古い絵を片付けてから新しい絵を描く",
+              "criteria":[
+                { "text":"画面幅が767pxの境界をまたいだ後も、ヒーローのLottieが描画され続けている",
+                  "verify":"Playwrightで境界をまたぎ、[data-hero=\"lottie\"]の子要素が1つ残り、SVGの表示面積が0より大きいことを検査する。証拠はci-greenのrun URL",
+                  "evidence":"" }
+              ] },
+            { "id":"G-5-11", "kind":"state",
+              "theme":"サイトを直しても、開発の進め方のルールが消えない",
+              "meaning":"次のセッションが同じ規律で動ける",
+              "detail":"静的サイト専用化に合わせてAGENTS.mdを整理する際、検証の規律・セッション開始の儀式・原子ツリー・PR規約まで一緒に消してしまわない。テンプレ運用固有の節（テンプレの位置づけ、初期化フロー、スタック未決定、配下オーバーライド）は削除してよい",
+              "criteria":[
+                { "text":"AGENTS.mdに『案件の絶対起点』『普遍ルール』『検証の規律』『PR instructions』『セッション開始の儀式』の5節が揃っている",
+                  "verify":"`node --test tests/unit/repository-contract.test.mjs` の AGENTS.md 規律節テストが exit 0。証拠はci-greenのrun URL",
                   "evidence":"" }
               ] }
           ] }

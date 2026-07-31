@@ -42,6 +42,49 @@ test("removed template and workspace paths do not return", () => {
   }
 });
 
+test("AGENTS.md keeps the working discipline that outlives any one site change", () => {
+  const agents = readFileSync("AGENTS.md", "utf8");
+
+  // 静的サイト専用へ整理するときに、開発の進め方そのものを一緒に消さないための歯止め。
+  const requiredSections = [
+    "## 案件の絶対起点",
+    "## 普遍ルール",
+    "## 検証の規律",
+    "## PR instructions",
+    "## セッション開始の儀式",
+  ];
+  for (const heading of requiredSections) {
+    assert.ok(
+      agents.includes(heading),
+      `${heading} が AGENTS.md から失われています`,
+    );
+  }
+
+  // 規律の中身が見出しだけの空箱になっていないこと。
+  for (const rule of [
+    "docs/goal-gate.md",
+    ".claude/agents/independent-verifier.md",
+    "checkin-checkout",
+    "docs/failures.md",
+  ]) {
+    assert.ok(agents.includes(rule), `${rule} への導線が AGENTS.md にありません`);
+  }
+
+  // 削除済みのテンプレ用ファイルを指し続けないこと（参照切れの禁止）。
+  for (const removed of [
+    "presets/",
+    "apps/web",
+    "scripts/setup.sh",
+    "pnpm-workspace",
+    "auto-merge",
+  ]) {
+    assert.ok(
+      !agents.includes(removed),
+      `AGENTS.md が削除済みの ${removed} を参照しています`,
+    );
+  }
+});
+
 test("deployment documentation separates the repository and Pages names", () => {
   const deploy = readFileSync("docs/site/DEPLOY.md", "utf8");
 

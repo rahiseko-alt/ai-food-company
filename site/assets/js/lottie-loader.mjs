@@ -60,6 +60,14 @@ export class LottieLoader {
     const data = await this.fetchData(mobile);
     if (token !== this.loadToken) return false;
 
+    // lottie-web の destroy() は「自分のコンテナを丸ごと空にする」実装なので、
+    // 新旧が同じコンテナに同居した状態で古い方を destroy すると、
+    // 直前に描いた新しい SVG まで巻き込んで消える（＝差し替え後にヒーローが空になる）。
+    // 必ず「古いものを片付けてから新しいものを描く」順序にする。
+    this.animation?.destroy();
+    this.animation = null;
+    this.mobile = null;
+
     const next = this.lottieApi.loadAnimation({
       container: this.container,
       renderer: 'svg',
@@ -86,7 +94,6 @@ export class LottieLoader {
       return false;
     }
 
-    this.animation?.destroy();
     this.animation = next;
     this.mobile = mobile;
     this.data = data;
@@ -133,5 +140,8 @@ export class LottieLoader {
     this.fetchController = null;
     this.animation?.destroy();
     this.animation = null;
+    // 幅の記憶も捨てる。残すと switchForWidth が「同じ幅だから何もしない」と誤判定し、
+    // 破棄したまま二度と描き直せなくなる。
+    this.mobile = null;
   }
 }

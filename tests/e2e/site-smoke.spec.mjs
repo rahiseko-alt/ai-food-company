@@ -188,6 +188,18 @@ test('missing GSAP falls back without waiting forever', async ({ page }, testInf
   await expect(page.locator('#contact')).toBeVisible();
 });
 
+// 描画されている絵の大きさ。状態フラグだけを見ると「正しい方を選んだが何も描かれていない」
+// を見逃すので、必ず実物の SVG を測る。
+const renderedArtwork = () => {
+  const container = document.querySelector('[data-hero="lottie"]');
+  const svg = container.querySelector('svg');
+  const bounds = svg?.getBoundingClientRect();
+  return {
+    children: container.childElementCount,
+    area: bounds ? Math.round(bounds.width * bounds.height) : 0,
+  };
+};
+
 test('crossing the mobile breakpoint preserves Lottie progress', async ({ page }, testInfo) => {
   useFocusedProject(testInfo);
   await page.goto('/');
@@ -198,6 +210,44 @@ test('crossing the mobile breakpoint preserves Lottie progress', async ({ page }
     .toBe(false);
   const after = await page.evaluate(() => window.koseFoodAi.opening.loader.progress);
   expect(after).toBeGreaterThanOrEqual(before);
+});
+
+test('crossing the breakpoint keeps the hero artwork on screen', async ({ page }, testInfo) => {
+  useFocusedProject(testInfo);
+  test.setTimeout(40_000);
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-opening-state', 'playing');
+  await expect.poll(() => page.evaluate(renderedArtwork)).toMatchObject({ children: 1 });
+  const before = await page.evaluate(renderedArtwork);
+  expect(before.area).toBeGreaterThan(0);
+
+  // 端末の回転に相当する。767px の境界をまたぐので Lottie が差し替わる
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await expect.poll(() => page.evaluate(() => window.koseFoodAi.opening.loader.mobile))
+    .toBe(false);
+  await expect.poll(() => page.evaluate(renderedArtwork)).toMatchObject({ children: 1 });
+  expect((await page.evaluate(renderedArtwork)).area).toBeGreaterThan(0);
+
+  // 戻したときも描かれたままであること
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => page.evaluate(() => window.koseFoodAi.opening.loader.mobile))
+    .toBe(true);
+  await expect.poll(() => page.evaluate(renderedArtwork)).toMatchObject({ children: 1 });
+  expect((await page.evaluate(renderedArtwork)).area).toBeGreaterThan(0);
+});
+
+test('re-mounting never leaves the hero container empty', async ({ page }, testInfo) => {
+  useFocusedProject(testInfo);
+  await page.goto('/#top');
+  await expect(page.locator('html')).toHaveAttribute('data-opening-state', 'ready');
+  await expect.poll(() => page.evaluate(renderedArtwork)).toMatchObject({ children: 1 });
+
+  // 同じコンテナへの載せ替えを直接叩く。旧実装はここでコンテナごと空になっていた
+  const remounted = await page.evaluate(() =>
+    window.koseFoodAi.opening.loader.mountForWidth(window.innerWidth, 1));
+  expect(remounted).toBe(true);
+  expect(await page.evaluate(renderedArtwork)).toMatchObject({ children: 1 });
+  expect((await page.evaluate(renderedArtwork)).area).toBeGreaterThan(0);
 });
 
 test('crossing the breakpoint while loading selects the current Lottie', async ({
