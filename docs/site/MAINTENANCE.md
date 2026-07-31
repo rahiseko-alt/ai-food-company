@@ -41,10 +41,13 @@ pnpm run test:e2e
 
 ```sh
 pnpm run lint:css
+pnpm run verify:asset-version
 pnpm run test:e2e
 ```
 
 320、390、768、1024、1440px幅で横にはみ出さず、文字や操作が重ならないことも見ます。
+
+`site.css` の中身を1行でも変えたら、必ず「CSS/JSのキャッシュを更新する（?v=）」の手順に従います。
 
 ## 画像を変える
 
@@ -57,8 +60,35 @@ pnpm run test:e2e
 pnpm run verify:references
 ```
 
-本番では `assets/` が長くキャッシュされます。公開後に古い画像が残る場合は、
-Cloudflare Pages のキャッシュを消すか、ファイル名を変更します。
+本番では `assets/` が1年キャッシュされます（`site/_headers`）。画像は現状、下記の
+バージョン機構の対象外なので、公開後に古い画像が残る場合はCloudflare Pagesのキャッシュを
+消すか、ファイル名そのものを変更してください。
+
+## CSS/JSのキャッシュを更新する（?v=）
+
+`site/assets/css/*.css` と `site/assets/js/*.mjs` は `site/_headers` により
+**1年・immutable** でキャッシュされます。中身だけ差し替えてファイル名（`?v=`込み）を
+変えないと、公開前からサイトを開いていた人には新しい内容が一生届きません
+（2026-07-31、これが原因で上部バーが消えたまま戻らない事故になりました。
+`docs/failures.md` 参照）。
+
+**`site/assets/css/site.css` か `site/assets/js/*.mjs` のどれか1つでも中身を変えたら、
+`?v=` の値を全部まとめて同じ新しい値に上げてください。** 対象は次の全箇所です。
+
+- `site/index.html` の `assets/css/site.css?v=...` と `assets/js/main.mjs?v=...`
+- `site/assets/js/*.mjs` 同士の `import ... from './xxx.mjs?v=...'`
+
+値は日付でも連番でもよく、揃っていることだけが重要です（例: `2026-07-31` → `2026-08-01`）。
+
+確認:
+
+```sh
+pnpm run verify:asset-version
+```
+
+これは値が全ファイルで揃っているかだけを機械で見ます（一部だけ上げ忘れる事故を防ぎます）。
+公開後は `docs/site/DEPLOY.md` の prod-smoke を手動実行し、本番の `?v=` 付きURLが
+実際に200で取得できることまで確認してください。
 
 ## オープニングを変える
 
@@ -90,6 +120,7 @@ JavaScriptが参照する送信先が一致していることを確認します�
 ```sh
 pnpm run verify:references
 pnpm run verify:lottie
+pnpm run verify:asset-version
 pnpm run lint
 pnpm run test:unit
 pnpm run test:e2e

@@ -39,6 +39,9 @@ jobs:
       - name: Check Lottie contract
         run: pnpm run verify:lottie
 
+      - name: Check asset version consistency
+        run: pnpm run verify:asset-version
+
       - name: Lint HTML, CSS, and JavaScript
         run: pnpm run lint
 

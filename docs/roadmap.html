@@ -119,8 +119,8 @@
   "meta": {
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
-    "active": "G-4-1",
-    "next": "最優先は上部バー消失の原因特定（未解決・本番で発生中）。手元で再現できていないので、まずマスターの環境から、どのスタイルシートのどのセレクタが上部バーにopacityを当てているかを名指しさせるプローブを実行してもらう。document.styleSheetsを全走査し、要素がselectorTextにmatchesし、かつrule.style.opacityが空でないものを列挙する形。出所がsite.css以外（ユーザースタイルシート・OSやブラウザの設定・経路上の書き換え等）ならそちらを追う。site.cssなら私の再現条件がまだ違うので、マスターの実機条件（OS・ブラウザ版・拡大率・表示幅・フォント読込の成否）を揃えて再現し直す。仮説は複数並べて潰すこと。1つに決め打ちしない。なお副次的に見つかった、JSがloadingを設定する前に上部バーが一瞬見えて消えるちらつきは別件として直す価値がある（今回の件とは無関係）。その先はG-4-1すなわち相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。",
+    "active": "G-6-2",
+    "next": "このPRをマージしたら、GitHub Actions の prod-smoke を手動実行し、新設した『アセットのバージョン付きURLが本番で200』ステップ（G-6-2）が緑になることを確認し、その run URL を G-6-1 と G-6-2 の evidence に記入する（G-6-1はこのPRのci-green run URLでもよい）。あわせてマスターに本番 https://food.kouheikosehira.com/#top を通常どおり開いてもらい、上部バーが消えたままにならないことを確認してもらう（?v=でURLそのものが変わるため、キャッシュ削除やハード再読み込みは不要のはず）。副次的に見つかっているちらつき（JSがloadingを設定する前に上部バーが一瞬見えて消える）は今回の件とは無関係の別件として、直す価値があるが未着手。以上が済んだらG-4-1すなわち相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
@@ -145,8 +145,8 @@
       "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "サイトを本番公開しました。①PR#11 を main へマージ（b51a8e6）。②Cloudflare Pages プロジェクト ai-food-company を作成し、Build output directory を site にしてリポジトリを接続 → https://ai-food-company.pages.dev で表示を確認。③カスタムドメイン food.kouheikosehira.com を接続。④prod-smoke を手動実行し、本番が 200＋マーカー・主要アセット 200・apex の A と Google Workspace の MX 無傷を機械で確認（run 30513706224）。⑤FormSubmit の初回有効化をマスターが実施し、テスト送信で store/name/contact/detail の4項目が届くことを確認。⑥ロードマップの G-1 系・G-2 系に evidence（マージSHA / CI run / 公開URL / prod-smoke run）を記入。⑦飲食コンサル29社（AI/IT/従来型の3軸）の実地HP構成調査を実施し、docs/site/research-competitor-hp.md（監査用一覧表つき生データ）と docs/site/recommended-pattern.md（確信度つきの次回リニューアル推奨）を追加。⑧G-5安定化を実装し、スマホ筆文字固定、通常フロー、状態管理、フォールバック、5画面レスポンシブ、native dialog、フォーム多重送信防止、静的サイト一本化、実ブラウザCIを追加。Node 22 / pnpm 10.33.0で参照・Lottie・lint・単体6件・E2E24件・axe5画面・moderate監査・roadmap検査をローカル通過。独立検証者が回転連打・読込中SKIP・bfcacheの3競合を発見し、再現テストと修正後の再監査で全件解消を確認。⑨そのPR#14を別セッションで独立レビューし、実画面5サイズ（320/390/768/1024/1440）とmainとの対照実験で重大な表示退行を1件確認した。767pxの境界をまたぐとヒーローのLottieが消え、幅を戻しても復活しない（スマホの回転で再現）。原因はlottie-loader.mjsで新しい絵を載せてから古い絵をdestroyしていたことで、lottie-webのdestroy()がコンテナを丸ごと空にするため新しい絵まで消えていた。順序を入れ替えて修正し、境界またぎ後もSVGが残ることを検査するE2Eを2本追加した（G-5-10）。⑩あわせてAGENTS.mdを統合し直し、mainにあった規律5節（案件の絶対起点・普遍ルール・検証の規律・PR instructions・セッション開始の儀式）を復元、テンプレ運用固有の4節は削除したまま、削除済みパスへの参照を0件にした。規律節の生存を守る単体テストも追加した（G-5-11）。⑪PR#15をマージ後、CodeRabbitのレビューで自分が作り込んだ後退を1件指摘され、追いかけで直した。⑨の順序入れ替えにより、差し替え中はloader.animationが一時的にnullになる窓ができ、その間に届いたリサイズをOpeningController.onResizeのガードが捨てるようになっていた。CodeRabbitの提案どおりガードをmountAttemptedに変えると同時mountが可能になり、無効化された側のnext.destroy()が共有コンテナを空にして⑨と同じ経路をより広い窓で開くため採らず、onResizeの最後で「最終的な幅」と「実際に載っている版」を突き合わせ、食い違っていたら一度だけ合わせ直す自己修復にした。あわせてdocs/site/README.mdにplaywright install chromiumの前提を追記した。⑫PR#15/#17をマージし本番のprod-smokeまで緑にしたあと、マスターから新しい表示不具合の報告を受けた（未解決のまま次セッションへ引き継ぐ）。症状はPC・本番で上部バーが一度出て、画面全体がカクっとなって消え、以降は消えたまま。オープニング自体は最後まで完走することをマスターが確認済み。マスター環境の実測値（/#topで表示幅582px）は state=ready / opacity=0 / transform=none / position=fixed / visibility=visible / display=flex / z-index=9999 / top=0 / インラインstyleは空 / prefers-reduced-motionはfalse。インラインが空なのでJavaScriptのインラインスタイルではなくCSS由来。ただし手元では582・1024・1440・1920のいずれの幅でも再現せず、readyでopacityは1・インライン空・fixedのまま残る。本番が配信しているindex.html・site.css・opening-controller.mjs・main.mjsはcurlで取得して手元と同一と確認済みで、コードの差ではない。リポジトリのCSSで上部バーを隠すルールはdata-opening-stateがloadingのときの1つだけで、readyでは一致しない。副次的に、JSがloadingを設定する前に上部バーが素のCSSで一瞬描かれ直後に消えるちらつきは手元で再現した（12833msで可視、12887msでopacity0）が、readyで必ず戻るため今回の報告の原因ではない。別件として扱う。",
-      "trouble": "上部バー消失の原因を特定できないままセッションを終えた。切り分けで大きな遠回りをした。実測値（インライン空＝CSS由来）まで掴んだ直後に拡張機能が犯人だと決めつけ、その一本に絞って進めた。マスターがシークレットウィンドウで反証し、思い込みだと指摘を受けた。反証されるまで、本番が配信している成果物と手元が同一かという基本確認すらしていなかった（指摘後に実施して同一と判明）。再現できない不具合に対し、確度の低い仮説を1つだけ立てて追う進め方が誤りだった。"
+      "done": "上部バー消失の原因を特定し、直した。マスターに実行してもらったプローブ（document.styleSheetsを走査し、.headerにmatchしてopacityを持つルールを列挙）で「site.css / .header / opacity:0」の1件だけが返り、data-opening-state等の絞り込みが無い無条件ルールだった。git show b51a8e6:site/assets/css/site.cssと突き合わせ、これはPR#15（G-5安定化）より前、最初の公開（PR#11）時点の旧.headerルール（opacity:0基本＋JSの.loadedクラスで1に戻す旧方式）と一致すると特定した。site/_headersで/assets/*が『1年・immutable』キャッシュになっており、PR#15でsite.cssの中身を新方式（opacity:1基本＋[data-opening-state=loading]で0にする）へ書き換えた際にファイル名（参照）を変えなかったため、公開前からサイトを開いていたブラウザは1年間ずっと旧CSSを掴み続け、新JSは.loadedを付けないので誰も1に戻せず、上部バーが消えたまま戻らなかった。恒久対応として、ビルド無しの静的サイトでも運用できる手動キャッシュバスティングを実装した：index.htmlのsite.css/main.mjs参照とassets/js内の相互import（main.mjs→7件、opening-controller.mjs→1件）全てに共通の?v=2026-07-31を付与。整合性を機械強制するscripts/check-asset-version.mjsを新規作成し、pnpm run verify:asset-version として package.json / ci.yml / AGENTS.md必須チェックへ配線。prod-smoke.ymlに『本番index.htmlが配る?v=付きURLが実際に200を返すか』を確認する新ステップを追加（G-6-2）。docs/site/MAINTENANCE.md・DEPLOY.mdに手順を明文化。ロードマップにG-6（G-6-1コード整合性／G-6-2本番到達）を追加し、原因調査で見つかった事実をdetailに記録した。ローカルで verify:references / verify:lottie / verify:asset-version / lint / test:unit（7件）/ test:a11y（5画面）/ audit / verify:roadmap を確認し、いずれも緑。",
+      "trouble": "test:e2eのうち3件（mobile-390のregular opening reaches ready / final hero keeps both marquees / slow Lottie loading has a bounded failure path）がこのサンドボックス環境で失敗した。git stashで変更前のコードに戻して同じ3件を実行しても同様に失敗することを確認済みで、今回の変更が原因ではなく、docs/failures.md 2026-07-31（fonts.googleapis.comの遅延で固定時間予算のE2Eが偽の赤になる、既知の弱さ）と同種の環境要因。あわせてこのサンドボックスは/opt/pw-browsersのChromiumのビルド版がpackage.json記載の@playwright/testの期待版と食い違っており、e2e/a11yをローカルで動かすにはplaywright.config.mjsへ一時的にlaunchOptions.executablePathを足す必要があった（確認後にコミットせず元に戻した。CIはpnpm exec playwright install --with-deps chromiumで都度正しい版を入れるため影響しない）。"
     },
     "updated": "2026-07-31"
   },
@@ -405,6 +405,31 @@
                 { "text":"AGENTS.mdに『案件の絶対起点』『普遍ルール』『検証の規律』『PR instructions』『セッション開始の儀式』の5節が揃っている",
                   "verify":"`node --test tests/unit/repository-contract.test.mjs` の AGENTS.md 規律節テストが exit 0。証拠はci-greenのrun URL",
                   "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30598147015" }
+              ] }
+          ] },
+
+        { "id":"G-6", "kind":"state",
+          "theme":"アセットを差し替えても、古いキャッシュを掴んだ訪問者にも新しい版が届く",
+          "meaning":"直したはずの見た目・挙動が、キャッシュのせいで一部の人にだけ直らない事故を止める",
+          "detail":"site/_headers は /assets/* を『1年・immutable』でキャッシュしている（差し替えはファイル名を変える前提）。2026-07-31、PR#15でsite.cssの中身（上部バーの表示方式）を書き換えたのに参照のファイル名を変えなかったため、公開前からサイトを開いていたブラウザは1年間ずっと古いCSSを掴み続け、上部バーが消えたまま戻らない事故になった（マスターのブラウザで.headerの計算済みルールを実測し、PR#11時点の旧opacity:0基本ルールと一致することで特定。docs/failures.md 2026-07-31参照）。対策はビルド無しの静的サイトでも運用できる手動バージョニング：index.htmlの参照とassets/js内の相互importに共通の?v=を付け、差し替えるたびに全参照をまとめて上げる",
+          "children":[
+            { "id":"G-6-1", "kind":"state",
+              "theme":"CSSとJSの参照が、全部そろって同じ版番号を持っている",
+              "meaning":"一部だけ更新して古いままの参照が残る事故を防ぐ",
+              "detail":"index.htmlのsite.css/main.mjs参照と、assets/js/*.mjs同士の相互importの両方が対象。値そのものは問わず『揃っているか』だけを機械で見る",
+              "criteria":[
+                { "text":"index.htmlの assets/css・assets/js 参照と assets/js 内の相互importが、すべて同じ ?v=<値> を持つ",
+                  "verify":"`node scripts/check-asset-version.mjs` が単一の版で揃っていることを確認して exit 0。証拠はci-greenのrun URL",
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30607222487" }
+              ] },
+            { "id":"G-6-2", "kind":"state",
+              "theme":"本番で、その版番号付きURLが実際に生きている",
+              "meaning":"コードが正しいだけでなく、公開環境でも新しいURLとして取得できる",
+              "detail":"CIでの静的検査だけでは『Cloudflare Pagesに正しく反映されたか』は分からない。本番のindex.htmlが今まさに配っている?v=付きURLを取り出し、200で取得できることを実機で確かめる",
+              "criteria":[
+                { "text":"本番index.htmlが参照する ?v= 付きのCSS/JS URLが、本番で200を返す",
+                  "verify":"GitHub Actions の prod-smoke を手動実行し、『アセットのバージョン付きURLが本番で200』ステップが緑になること。証拠はその run URL",
+                  "evidence":"" }
               ] }
           ] }
       ] }

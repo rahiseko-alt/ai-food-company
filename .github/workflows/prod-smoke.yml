@@ -49,6 +49,27 @@ jobs:
           test "${fail}" = "0"
           echo "ASSETS OK: 主要アセットが本番で 200"
 
+      - name: アセットのバージョン付きURLが本番で 200 — G-6-2
+        run: |
+          # /assets/* は1年 immutable キャッシュ（site/_headers）。中身を差し替えても
+          # クエリ(?v=)を上げていなければ既存訪問者には一生届かない。ここでは
+          # 本番が実際に配っている index.html から現在の ?v= 付き参照を取り出し、
+          # そのURLがちゃんと 200 を返すこと（＝新しいURLとして生きていること）を確かめる。
+          curl -sS -L --max-time 30 "${PROD_URL}" -o body.html
+          fail=0
+          for p in $(grep -oE '(href|src)="assets/(css|js)/[^"]+"' body.html | sed -E 's/.*"(.*)"/\1/'); do
+            if [ "${p#*\?v=}" = "${p}" ]; then
+              echo "FAIL: ${p} に ?v= が付いていません（キャッシュバスティング未適用）"
+              fail=1
+              continue
+            fi
+            code=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 "${PROD_URL}/${p}")
+            echo "${code} ${p}"
+            [ "${code}" = "200" ] || fail=1
+          done
+          test "${fail}" = "0"
+          echo "ASSET VERSION OK: 本番のバージョン付きURLがすべて 200"
+
       - name: 問い合わせ導線が公開されている
         run: |
           curl -sS -L --max-time 30 "${PROD_URL}" -o body.html

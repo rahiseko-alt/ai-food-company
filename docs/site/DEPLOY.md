@@ -137,6 +137,11 @@ git add -A && git commit -m "..." && git push
 `assets/` は1年キャッシュの設定（`_headers`）なので、画像や Lottie を差し替えたときは
 Pages の **Deployments → Manage → Purge cache** を実行するか、ファイル名を変える。
 
+`site/assets/css/*.css` と `site/assets/js/*.mjs` の中身を変えたときは、キャッシュのパージでは
+不十分（公開前から開いていた人のブラウザには一生届かない）。必ず `docs/site/MAINTENANCE.md`
+「CSS/JSのキャッシュを更新する（?v=）」の手順で `?v=` を上げる（`pnpm run verify:asset-version`
+で機械チェックできる）。
+
 ---
 
 ## 7. 公開できたことを機械で確かめる
@@ -148,6 +153,7 @@ Pages の **Deployments → Manage → Purge cache** を実行するか、ファ
 |---|---|
 | prod 200 + marker | `https://food.kouheikosehira.com` が 200 で、本文に `Kose Food AI` を含む |
 | 公開アセット | CSS / ES Modules / Lottie / 壁紙が本番で 200 |
+| アセットの `?v=` | 本番HTMLが参照する `?v=` 付きCSS/JS URLが実際に本番で 200 |
 | フォーム導線 | 問い合わせ欄と送信フォームが公開HTMLに存在する |
 | DNS 無傷 | apex の A レコードが生きていて、MX が Google Workspace のまま |
 
