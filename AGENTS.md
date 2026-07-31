@@ -129,6 +129,7 @@ Node.js 22 と pnpm 10.33.0 を使用します。ビルド処理はありませ�
 pnpm install --frozen-lockfile
 pnpm run verify:references
 pnpm run verify:lottie
+pnpm run verify:asset-version
 pnpm run lint
 pnpm run test:unit
 pnpm run test:e2e
