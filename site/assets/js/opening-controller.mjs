@@ -60,7 +60,9 @@ export class OpeningController {
       this.setState('ready');
       this.revealFinalState();
       this.startLoops();
-      this.loader.mountForWidth(window.innerWidth, 1).catch(() => {});
+      this.loader.mountForWidth(window.innerWidth, 1)
+        .then(() => this.reconcileWidth())
+        .catch(() => {});
       return;
     }
 
@@ -77,6 +79,8 @@ export class OpeningController {
       ]);
       if (this.state !== 'loading') return;
       await this.loader.switchForWidth(window.innerWidth);
+      if (this.state !== 'loading') return;
+      await this.reconcileWidth();
       if (this.state !== 'loading') return;
       this.buildTimeline();
       this.setState('playing');
@@ -204,7 +208,7 @@ export class OpeningController {
       this.unlockScroll();
       this.setState('ready');
       this.loader.mountForWidth(window.innerWidth, 1)
-        .then(() => this.loader.switchForWidth(window.innerWidth))
+        .then(() => this.reconcileWidth())
         .catch(() => {});
       return;
     }
@@ -212,6 +216,23 @@ export class OpeningController {
     this.timeline.timeScale(2);
     this.timeline.play();
     this.setTimer(() => this.finish(), 1800);
+  }
+
+  // 取りこぼしの自己修復。
+  // 差し替え中は loader.animation が一時的に null になるため、その間に届いたリサイズは
+  // onResize の入口のガードで捨てられる。捨てられたまま止まると、最後の幅と実際に載って
+  // いる版が食い違ったままになる（例：スマホ幅なのにPC版のまま）。
+  // そこで mount が確定するたびに「今の幅」と「載っている版」を突き合わせ、食い違って
+  // いれば合わせ直す。合わせ直している最中にさらに幅が変わる場合に備えて数回まで繰り返し、
+  // 回数で頭打ちにして無限ループを避ける。
+  async reconcileWidth(request) {
+    for (let pass = 0; pass < 3; pass += 1) {
+      if (this.state === 'destroyed') return;
+      if (!this.loader.animation) return;
+      if (this.loader.isMobile(window.innerWidth) === this.loader.mobile) return;
+      await this.loader.switchForWidth(window.innerWidth);
+      if (request !== undefined && request !== this.resizeRequest) return;
+    }
   }
 
   async onResize() {
@@ -229,6 +250,17 @@ export class OpeningController {
       return;
     }
     if (request !== this.resizeRequest) return;
+
+    try {
+      await this.reconcileWidth(request);
+    } catch (error) {
+      if (request !== this.resizeRequest) return;
+      console.error('[opening resize reconcile]', error);
+      this.fail();
+      return;
+    }
+    if (request !== this.resizeRequest) return;
+
     const shouldResume = this.resumeAfterResize;
     this.resumeAfterResize = false;
     if (shouldResume && ['playing', 'skipping'].includes(this.state)) this.timeline.play();
@@ -266,7 +298,7 @@ export class OpeningController {
     if (this.restoreLottieOnPageShow) {
       this.restoreLottieOnPageShow = false;
       this.loader.mountForWidth(window.innerWidth, 1)
-        .then(() => this.loader.switchForWidth(window.innerWidth))
+        .then(() => this.reconcileWidth())
         .catch(() => {});
     }
   }
