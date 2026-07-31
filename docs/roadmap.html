@@ -119,8 +119,8 @@
   "meta": {
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
-    "active": "G-6-2",
-    "next": "このPRをマージしたら、GitHub Actions の prod-smoke を手動実行し、新設した『アセットのバージョン付きURLが本番で200』ステップ（G-6-2）が緑になることを確認し、その run URL を G-6-1 と G-6-2 の evidence に記入する（G-6-1はこのPRのci-green run URLでもよい）。あわせてマスターに本番 https://food.kouheikosehira.com/#top を通常どおり開いてもらい、上部バーが消えたままにならないことを確認してもらう（?v=でURLそのものが変わるため、キャッシュ削除やハード再読み込みは不要のはず）。副次的に見つかっているちらつき（JSがloadingを設定する前に上部バーが一瞬見えて消える）は今回の件とは無関係の別件として、直す価値があるが未着手。以上が済んだらG-4-1すなわち相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。",
+    "active": "G-4-1",
+    "next": "G-6は完了（PR#19マージ済み647aee0、prod-smoke run 30607624515でG-6-2も緑）。マスターに本番 https://food.kouheikosehira.com/#top を通常どおり開いてもらい、上部バーが消えたままにならないことを確認してもらう（?v=でURLそのものが変わるため、キャッシュ削除やハード再読み込みは不要のはず）。副次的に見つかっているちらつき（JSがloadingを設定する前に上部バーが一瞬見えて消える）は今回の件とは無関係の別件として、直す価値があるが未着手。次はG-4-1すなわち相談の条件（初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝岐阜・愛知の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。",
@@ -145,7 +145,7 @@
       "_note": "本来は A=goal-drafter が答え、B=basis-reviewer が採点し、人間が争点ごとに『直させる/通す』を選ぶ三段構成（docs/goal-gate.md）。今回はセッションの制約でサブエージェントを起動していないため、この回答はデプロイ担当セッションの下書きであり、B による採点と人間の判定は未了。CHK3 が切れている点（Q4 の証拠が逸話のみ）が最大の争点で、ここをマスターが『通す（理由を記録）』か『直させる』かで判断すること。"
     },
     "handoff": {
-      "done": "上部バー消失の原因を特定し、直した。マスターに実行してもらったプローブ（document.styleSheetsを走査し、.headerにmatchしてopacityを持つルールを列挙）で「site.css / .header / opacity:0」の1件だけが返り、data-opening-state等の絞り込みが無い無条件ルールだった。git show b51a8e6:site/assets/css/site.cssと突き合わせ、これはPR#15（G-5安定化）より前、最初の公開（PR#11）時点の旧.headerルール（opacity:0基本＋JSの.loadedクラスで1に戻す旧方式）と一致すると特定した。site/_headersで/assets/*が『1年・immutable』キャッシュになっており、PR#15でsite.cssの中身を新方式（opacity:1基本＋[data-opening-state=loading]で0にする）へ書き換えた際にファイル名（参照）を変えなかったため、公開前からサイトを開いていたブラウザは1年間ずっと旧CSSを掴み続け、新JSは.loadedを付けないので誰も1に戻せず、上部バーが消えたまま戻らなかった。恒久対応として、ビルド無しの静的サイトでも運用できる手動キャッシュバスティングを実装した：index.htmlのsite.css/main.mjs参照とassets/js内の相互import（main.mjs→7件、opening-controller.mjs→1件）全てに共通の?v=2026-07-31を付与。整合性を機械強制するscripts/check-asset-version.mjsを新規作成し、pnpm run verify:asset-version として package.json / ci.yml / AGENTS.md必須チェックへ配線。prod-smoke.ymlに『本番index.htmlが配る?v=付きURLが実際に200を返すか』を確認する新ステップを追加（G-6-2）。docs/site/MAINTENANCE.md・DEPLOY.mdに手順を明文化。ロードマップにG-6（G-6-1コード整合性／G-6-2本番到達）を追加し、原因調査で見つかった事実をdetailに記録した。ローカルで verify:references / verify:lottie / verify:asset-version / lint / test:unit（7件）/ test:a11y（5画面）/ audit / verify:roadmap を確認し、いずれも緑。",
+      "done": "上部バー消失の原因を特定し、直した。マスターに実行してもらったプローブ（document.styleSheetsを走査し、.headerにmatchしてopacityを持つルールを列挙）で「site.css / .header / opacity:0」の1件だけが返り、data-opening-state等の絞り込みが無い無条件ルールだった。git show b51a8e6:site/assets/css/site.cssと突き合わせ、これはPR#15（G-5安定化）より前、最初の公開（PR#11）時点の旧.headerルール（opacity:0基本＋JSの.loadedクラスで1に戻す旧方式）と一致すると特定した。site/_headersで/assets/*が『1年・immutable』キャッシュになっており、PR#15でsite.cssの中身を新方式（opacity:1基本＋[data-opening-state=loading]で0にする）へ書き換えた際にファイル名（参照）を変えなかったため、公開前からサイトを開いていたブラウザは1年間ずっと旧CSSを掴み続け、新JSは.loadedを付けないので誰も1に戻せず、上部バーが消えたまま戻らなかった。恒久対応として、ビルド無しの静的サイトでも運用できる手動キャッシュバスティングを実装した：index.htmlのsite.css/main.mjs参照とassets/js内の相互import（main.mjs→7件、opening-controller.mjs→1件）全てに共通の?v=2026-07-31を付与。整合性を機械強制するscripts/check-asset-version.mjsを新規作成し、pnpm run verify:asset-version として package.json / ci.yml / AGENTS.md必須チェックへ配線。prod-smoke.ymlに『本番index.htmlが配る?v=付きURLが実際に200を返すか』を確認する新ステップを追加（G-6-2）。docs/site/MAINTENANCE.md・DEPLOY.mdに手順を明文化。ロードマップにG-6（G-6-1コード整合性／G-6-2本番到達）を追加し、原因調査で見つかった事実をdetailに記録した。ローカルで verify:references / verify:lottie / verify:asset-version / lint / test:unit（7件）/ test:a11y（5画面）/ audit / verify:roadmap を確認し、いずれも緑。PR#19をci-green（11チェック）を確認後にマージ（647aee0）。マージ後にprod-smokeを手動実行し、新設の『アセットのバージョン付きURLが本番で200』ステップを含め全緑（run 30607624515）。G-6-1・G-6-2ともevidenceを記入し、G-6を完了した。",
       "trouble": "test:e2eのうち3件（mobile-390のregular opening reaches ready / final hero keeps both marquees / slow Lottie loading has a bounded failure path）がこのサンドボックス環境で失敗した。git stashで変更前のコードに戻して同じ3件を実行しても同様に失敗することを確認済みで、今回の変更が原因ではなく、docs/failures.md 2026-07-31（fonts.googleapis.comの遅延で固定時間予算のE2Eが偽の赤になる、既知の弱さ）と同種の環境要因。あわせてこのサンドボックスは/opt/pw-browsersのChromiumのビルド版がpackage.json記載の@playwright/testの期待版と食い違っており、e2e/a11yをローカルで動かすにはplaywright.config.mjsへ一時的にlaunchOptions.executablePathを足す必要があった（確認後にコミットせず元に戻した。CIはpnpm exec playwright install --with-deps chromiumで都度正しい版を入れるため影響しない）。"
     },
     "updated": "2026-07-31"
@@ -429,7 +429,7 @@
               "criteria":[
                 { "text":"本番index.htmlが参照する ?v= 付きのCSS/JS URLが、本番で200を返す",
                   "verify":"GitHub Actions の prod-smoke を手動実行し、『アセットのバージョン付きURLが本番で200』ステップが緑になること。証拠はその run URL",
-                  "evidence":"" }
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30607624515" }
               ] }
           ] }
       ] }
