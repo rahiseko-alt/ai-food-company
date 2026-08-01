@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { LANGUAGES, I18N } from '../../site/assets/js/i18n-data.mjs';
 
 const useFocusedProject = (testInfo, project = 'mobile-390') => {
   const covered = Array.isArray(project) ? project : [project];
@@ -372,23 +373,31 @@ test('menu dialog blocks the background and restores focus', async ({ page }) =>
     .not.toBe('hidden');
 });
 
-test('language switcher updates key content and persists across reload', async ({ page }, testInfo) => {
+test('language switcher renders every supported language and persists across reload', async ({ page }, testInfo) => {
   useFocusedProject(testInfo, 'desktop-1024');
+  test.setTimeout(60_000); // 6言語ぶんの実描画チェックは既定の30秒に収まらないため延長する
   await page.goto('/#top');
-  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('ホーム');
+  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText(I18N.ja['nav.home']);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
 
-  await page.selectOption('.header__lang-select', 'en');
-  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('Home');
-  await expect(page.locator('[data-i18n="header.cta"]')).toHaveText('Contact ›');
-  await expect(page.locator('[data-i18n="contact.language_note"]')).toHaveText(
-    'Follow-up after your inquiry (phone calls, meetings) will be conducted in Japanese.',
-  );
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  // i18n-data.mjs から実際の訳文を読み、ja/en/zh/ne/vi/th 全言語の実描画とlang属性を検査する
+  // （訳文をテスト側に手書きで複製しない。CodeRabbitレビュー指摘 #21 への対応：
+  // 以前はja→enの2言語しか実測しておらず、G-7-1の受入基準「6言語で切り替わる」と
+  // 証拠の粒度が一致していなかった）。
+  for (const lang of LANGUAGES) {
+    await page.selectOption('.header__lang-select', lang);
+    await expect(page.locator('html')).toHaveAttribute('lang', lang);
+    await expect(page.locator('[data-i18n="nav.home"]')).toHaveText(I18N[lang]['nav.home']);
+    await expect(page.locator('[data-i18n="header.cta"]')).toHaveText(I18N[lang]['header.cta']);
+    await expect(page.locator('[data-i18n="contact.language_note"]')).toHaveText(
+      I18N[lang]['contact.language_note'],
+    );
+  }
 
+  const lastLang = LANGUAGES[LANGUAGES.length - 1];
   await page.reload();
-  await expect(page.locator('.header__lang-select')).toHaveValue('en');
-  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('Home');
+  await expect(page.locator('.header__lang-select')).toHaveValue(lastLang);
+  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText(I18N[lastLang]['nav.home']);
 });
 
 test('language switcher stays reachable on mobile', async ({ page }, testInfo) => {
