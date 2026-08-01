@@ -375,15 +375,17 @@ test('menu dialog blocks the background and restores focus', async ({ page }) =>
 
 test('language switcher renders every supported language and persists across reload', async ({ page }, testInfo) => {
   useFocusedProject(testInfo, 'desktop-1024');
-  test.setTimeout(60_000); // 6言語ぶんの実描画チェックは既定の30秒に収まらないため延長する
+  test.setTimeout(180_000); // 6言語×各言語ごとのreload（フォント再読込を伴う）は既定の30秒に大きく収まらないため延長する
   await page.goto('/#top');
   await expect(page.locator('[data-i18n="nav.home"]')).toHaveText(I18N.ja['nav.home']);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
 
-  // i18n-data.mjs から実際の訳文を読み、ja/en/zh/ne/vi/th 全言語の実描画とlang属性を検査する
-  // （訳文をテスト側に手書きで複製しない。CodeRabbitレビュー指摘 #21 への対応：
-  // 以前はja→enの2言語しか実測しておらず、G-7-1の受入基準「6言語で切り替わる」と
-  // 証拠の粒度が一致していなかった）。
+  // i18n-data.mjs から実際の訳文を読み、ja/en/zh/ne/vi/th 全言語の実描画・lang属性・
+  // reload後の永続化を検査する（訳文をテスト側に手書きで複製しない）。
+  // CodeRabbitレビュー指摘 #21 への対応：以前はja→enの2言語しか実測していなかった。
+  // CodeRabbitレビュー指摘 #22 への対応：reloadの確認はループの外に1回だけ置いていたため、
+  // 最後の言語（th）以外の5言語はreload後の永続化が未検証のまま合格していた。
+  // reload確認を各言語のループ内に移し、全言語で実測する。
   for (const lang of LANGUAGES) {
     await page.selectOption('.header__lang-select', lang);
     await expect(page.locator('html')).toHaveAttribute('lang', lang);
@@ -392,12 +394,12 @@ test('language switcher renders every supported language and persists across rel
     await expect(page.locator('[data-i18n="contact.language_note"]')).toHaveText(
       I18N[lang]['contact.language_note'],
     );
-  }
 
-  const lastLang = LANGUAGES[LANGUAGES.length - 1];
-  await page.reload();
-  await expect(page.locator('.header__lang-select')).toHaveValue(lastLang);
-  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText(I18N[lastLang]['nav.home']);
+    await page.reload();
+    await expect(page.locator('.header__lang-select')).toHaveValue(lang);
+    await expect(page.locator('html')).toHaveAttribute('lang', lang);
+    await expect(page.locator('[data-i18n="nav.home"]')).toHaveText(I18N[lang]['nav.home']);
+  }
 });
 
 test('language switcher stays reachable on mobile', async ({ page }, testInfo) => {

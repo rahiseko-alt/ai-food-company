@@ -120,7 +120,7 @@
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
     "active": "G-4-1",
-    "next": "G-7（多言語対応）はPR#21でマージ済み（squash e030f38）。マージ後のCodeRabbit指摘（G-7-1のe2eテストが6言語のうちja→enの2言語しか実測していなかった）を受け、PR#22でテストをLANGUAGES全件（ja/en/zh/ne/vi/th）ループへ拡張し、G-7-1のevidenceも新しいrun URL（actions/runs/30675617278）に更新済み。PR#22のマージを確認すること。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAI下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）——公開後、可能な範囲でネイティブ確認を挟むこと。その後はG-4-1（相談の条件：初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。あわせて対象地域を『岐阜・愛知』→『東海地方』に訂正した今回の判断（meta.goalgate.amendments）を、G-4-1の文言確認と同時にsite/index.htmlの表記にも反映するか要確認。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。G-6は完了（PR#19マージ済み647aee0、prod-smoke run 30607624515でG-6-2も緑）。",
+    "next": "G-7（多言語対応）はPR#21（squash e030f38）→PR#22（squash 4779dac）とマージ済み。PR#22マージ直後にもう1件CodeRabbit指摘が届いた：reload後の永続化確認がforループの外に1回だけ書かれており、実際に検証されるのは最後の言語（th）だけで、他5言語は未検証のまま合格扱いになっていた。PR#23でreload確認をループ内に移し、全6言語で個別に検証するよう修正済み（ローカルでも6言語×reloadを確認、所要約1.7分）。PR#23のマージとG-7-1のevidence更新を確認すること。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAI下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）——公開後、可能な範囲でネイティブ確認を挟むこと。その後はG-4-1（相談の条件：初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。あわせて対象地域を『岐阜・愛知』→『東海地方』に訂正した今回の判断（meta.goalgate.amendments）を、G-4-1の文言確認と同時にsite/index.htmlの表記にも反映するか要確認。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。G-6は完了（PR#19マージ済み647aee0、prod-smoke run 30607624515でG-6-2も緑）。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝東海地方の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。（2026-07-31訂正：当初『岐阜・愛知』としていたが、マスター確定により『東海地方』（現地訪問できる範囲）に修正。県境の厳密な定義＝愛知・岐阜・三重の3県が基本か静岡を含む4県かは未確認）",
@@ -459,8 +459,8 @@
               "detail":"日本語を含む6言語（ja/en/zh/ne/vi/th）を切り替えられる。オープニング・スクロール演出のJSとは独立させ、DOM移動量やタイマーに依存させない（AGENTS.mdの結合ルール）。あわせてCloudflare Pagesのブランチプレビュー https://claude-checkin-kgggep.ai-food-company.pages.dev で実機確認済み",
               "criteria":[
                 { "text":"ヘッダーの言語切替UIを操作すると、ページ内の主要文言（ヒーロー・お品書き・相談フォームのラベル）が選択した言語の文言に切り替わり、選択状態が再訪時も保持される",
-                  "verify":"`language switcher renders every supported language and persists across reload`（tests/e2e/site-smoke.spec.mjs）がi18n-data.mjsのLANGUAGES全件（ja/en/zh/ne/vi/th）をループし、各言語での実描画・lang属性・reload後の永続化をPlaywrightで確認しexit 0。証拠はci-greenのrun URL",
-                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30675617278" }
+                  "verify":"`language switcher renders every supported language and persists across reload`（tests/e2e/site-smoke.spec.mjs）がi18n-data.mjsのLANGUAGES全件（ja/en/zh/ne/vi/th）をループし、各言語ごとに実描画・lang属性を確認したうえでreloadし、reload後もその言語のまま保持されることを個別に確認しexit 0（PR#22マージ後のCodeRabbit指摘：reload確認がループの外に1回だけあり、最後の言語以外は未検証だった。ループ内に移して全言語で実測するよう修正）。証拠はci-greenのrun URL",
+                  "evidence":"" }
               ] },
             { "id":"G-7-2", "kind":"state",
               "theme":"日本語の文言を直しても、5言語ぶんが古いまま取り残されない",
