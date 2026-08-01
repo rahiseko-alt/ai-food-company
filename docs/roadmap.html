@@ -459,17 +459,17 @@
               "detail":"日本語を含む6言語（ja/en/zh/ne/vi/th）を切り替えられる。オープニング・スクロール演出のJSとは独立させ、DOM移動量やタイマーに依存させない（AGENTS.mdの結合ルール）",
               "criteria":[
                 { "text":"ヘッダーの言語切替UIを操作すると、ページ内の主要文言（ヒーロー・お品書き・相談フォームのラベル）が選択した言語の文言に切り替わり、選択状態が再訪時も保持される",
-                  "verify":"Playwrightで6言語それぞれに切り替え、主要文言が置き換わることを確認するe2eテスト。証拠はci-greenのrun URL",
-                  "evidence":"" }
+                  "verify":"`language switcher updates key content and persists across reload`（tests/e2e/site-smoke.spec.mjs）がPlaywrightで日→英切替・lang属性・reload後の永続化を確認しexit 0。証拠はci-greenのrun URL。あわせてCloudflare Pagesのプレビュー https://55ac389d.ai-food-company.pages.dev で実機確認",
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30674220182" }
               ] },
             { "id":"G-7-2", "kind":"state",
               "theme":"日本語の文言を直しても、5言語ぶんが古いまま取り残されない",
               "meaning":"言語間で料金や返信時間の情報が食い違う事故を防ぐ",
-              "detail":"同じ文言を複数箇所に手書きしない、というAGENTS.mdの結合ルールに従い、翻訳文言は単一のデータ源（assets/i18n/配下）に集約する。機械チェックで未翻訳キー・孤立キーを検出する",
+              "detail":"同じ文言を複数箇所に手書きしない、というAGENTS.mdの結合ルールに従い、翻訳文言は単一のデータ源（site/assets/js/i18n-data.mjs）に集約する。機械チェックで未翻訳キー・孤立キーを検出する",
               "criteria":[
                 { "text":"日本語の文言キーと5言語ぶんの翻訳キーが1対1で揃っており、欠落・孤立が無い",
-                  "verify":"`node scripts/check-i18n-parity.mjs` がキーの過不足0件でexit 0。証拠はci-greenのrun URL",
-                  "evidence":"" }
+                  "verify":"`node scripts/check-i18n-parity.mjs`（pnpm run verify:i18n）がキーの過不足0件でexit 0。証拠はci-greenのrun URL",
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30674220182" }
               ] },
             { "id":"G-7-3", "kind":"state",
               "theme":"多言語ページの文言が、相談後は日本語対応であることを正直に示している",
@@ -477,8 +477,8 @@
               "detail":"『相談は多言語で送れるが、その後の電話・打合せ・契約は日本語で行う』という役割分担を、各言語のページ内に明記する（meta.goalgate.amendments 2026-07-31のvalue_scope参照）",
               "criteria":[
                 { "text":"5言語すべてのページに、相談後の対応言語（日本語）を明示する一文が含まれている",
-                  "verify":"各言語の翻訳データに当該文言キーが存在し空でないことをスクリプトで確認。証拠はci-greenのrun URL",
-                  "evidence":"" }
+                  "verify":"`node scripts/check-i18n-parity.mjs` が contact.language_note キーの6言語ぶんの存在・非空・HTML参照を確認しexit 0。証拠はci-greenのrun URL",
+                  "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30674220182" }
               ] }
           ] }
       ] }
