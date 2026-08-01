@@ -352,27 +352,6 @@ test('reduced motion removes the long runway and opening wait', async ({ page },
   expect(result.skipDisplay).toBe('none');
 });
 
-test('menu dialog blocks the background and restores focus', async ({ page }) => {
-  await page.goto('/#top');
-  const firstItem = page.locator('[data-menu]').first();
-  await firstItem.click();
-
-  const dialog = page.locator('dialog[data-hero="detail"]');
-  await expect(dialog).toBeVisible();
-  await expect(dialog.locator('[data-detail-title]')).toHaveText('現場診断');
-  expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow))
-    .toBe('hidden');
-  await expect(page.locator('[data-hero="detailclose"]')).toBeFocused();
-
-  await page.keyboard.press('Tab');
-  await expect(page.locator('[data-hero="detailclose"]')).toBeFocused();
-  await page.keyboard.press('Escape');
-  await expect(dialog).not.toBeVisible();
-  await expect(firstItem).toBeFocused();
-  expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow))
-    .not.toBe('hidden');
-});
-
 test('language switcher renders every supported language and persists across reload', async ({ page }, testInfo) => {
   useFocusedProject(testInfo, 'desktop-1024');
   test.setTimeout(180_000); // 6言語×各言語ごとのreload（フォント再読込を伴う）は既定の30秒に大きく収まらないため延長する

@@ -25,7 +25,11 @@ html {
 html.is-hash-syncing { scroll-behavior: auto; }
 
 body {
-  background: var(--color-paper) var(--paper-image) center center / cover no-repeat;
+  /* トップ(hero)の見え方は変えない。hero は高さ100svh固定のため、element毎の高さに依存するcoverでも
+     100svh基準でも結果は同じ。他のセクションはcoverだと自分の高さで縮尺が変わりheroと粒度がずれるため、
+     hero と同じ「高さ100svh基準」の縮尺に固定し、それより縦に長い分はrepeat-yで継ぎ足す
+     （セクションごとに壁紙の粒度が変わって見える問題への対処。基準はhero、hero側は変更しない） */
+  background: var(--color-paper) var(--paper-image) top center / auto 100svh repeat-y;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -114,7 +118,11 @@ a:hover { color: var(--color-red-bright); }
 
 .hero {
   position: relative; height: 100%; min-height: 0;
-  background: var(--color-paper) var(--paper-image) center center / cover no-repeat;
+  /* トップ(hero)の見え方は変えない。hero は高さ100svh固定のため、element毎の高さに依存するcoverでも
+     100svh基準でも結果は同じ。他のセクションはcoverだと自分の高さで縮尺が変わりheroと粒度がずれるため、
+     hero と同じ「高さ100svh基準」の縮尺に固定し、それより縦に長い分はrepeat-yで継ぎ足す
+     （セクションごとに壁紙の粒度が変わって見える問題への対処。基準はhero、hero側は変更しない） */
+  background: var(--color-paper) var(--paper-image) top center / auto 100svh repeat-y;
   overflow: hidden; z-index: 1;
   transform-origin: 50% 46%;
   will-change: transform;
@@ -225,7 +233,11 @@ a:hover { color: var(--color-red-bright); }
 /* --- 幕・挨拶 --------------------------------------------------------- */
 .whiteout {
   position: absolute; inset: 0; z-index: 20;
-  background: var(--color-paper) var(--paper-image) center center / cover no-repeat;
+  /* トップ(hero)の見え方は変えない。hero は高さ100svh固定のため、element毎の高さに依存するcoverでも
+     100svh基準でも結果は同じ。他のセクションはcoverだと自分の高さで縮尺が変わりheroと粒度がずれるため、
+     hero と同じ「高さ100svh基準」の縮尺に固定し、それより縦に長い分はrepeat-yで継ぎ足す
+     （セクションごとに壁紙の粒度が変わって見える問題への対処。基準はhero、hero側は変更しない） */
+  background: var(--color-paper) var(--paper-image) top center / auto 100svh repeat-y;
   opacity: 0; pointer-events: none;
 }
 .greeting {
@@ -238,7 +250,11 @@ a:hover { color: var(--color-red-bright); }
 /* Menu stays in normal flow and is never an animation target. */
 .menu {
   position: relative; z-index: 2;
-  background: var(--color-paper) var(--paper-image) center center / cover no-repeat;
+  /* トップ(hero)の見え方は変えない。hero は高さ100svh固定のため、element毎の高さに依存するcoverでも
+     100svh基準でも結果は同じ。他のセクションはcoverだと自分の高さで縮尺が変わりheroと粒度がずれるため、
+     hero と同じ「高さ100svh基準」の縮尺に固定し、それより縦に長い分はrepeat-yで継ぎ足す
+     （セクションごとに壁紙の粒度が変わって見える問題への対処。基準はhero、hero側は変更しない） */
+  background: var(--color-paper) var(--paper-image) top center / auto 100svh repeat-y;
   color: var(--color-ink);
   padding: calc(var(--header-height) + clamp(6px, 1.2vw, 28px)) var(--page-gutter) clamp(8px, 1.2vw, 32px);
   min-height: 100svh;
@@ -263,33 +279,25 @@ a:hover { color: var(--color-red-bright); }
   font-size: clamp(13px, 1.02vw, 18px); line-height: 1.85; color: #6B6156; text-wrap: pretty;
 }
 
-.menu__list { display: grid; gap: 0; justify-items: stretch; text-align: left; }
+.menu__list { display: grid; gap: clamp(18px, 1.8vw, 28px); justify-items: stretch; text-align: left; }
 .menu__item { display: block; }
-.menu__listhead {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
-  display: flex; align-items: baseline; justify-content: space-between; gap: 1em;
-  padding-bottom: clamp(6px, 0.7vw, 12px); border-bottom: 2px solid #B3241C;
-}
-.menu__listhead-label { font-weight: 700; font-size: clamp(13px, 1.1vw, 20px); letter-spacing: 0.14em; color: #1A1A1A; }
-.menu__listhead-note { font-size: clamp(11px, 0.85vw, 15px); letter-spacing: 0.06em; color: #6B6156; }
 
 .menu__row {
-  appearance: none; box-sizing: border-box; cursor: pointer;
-  border: 0; border-bottom: 1px dotted var(--color-rule); border-radius: 0;
-  background: transparent; color: inherit; font: inherit; text-align: left;
-  display: grid; grid-template-columns: 1fr auto; align-items: baseline;
+  box-sizing: border-box;
+  border: 0; border-bottom: 1px solid var(--color-rule);
+  display: grid; grid-template-columns: 1fr auto; align-items: start;
   gap: 0 clamp(10px, 1.2vw, 22px); width: 100%;
-  padding: clamp(9px, 1vw, 16px) clamp(4px, 0.6vw, 12px);
-  min-height: 44px;
+  padding: 0 clamp(4px, 0.6vw, 12px) clamp(14px, 1.4vw, 24px);
 }
-.menu__row:hover { background: #efe7d8; }
-.menu__row:focus-visible { position: relative; z-index: 1; }
-.menu__row-text { font-family: 'Zen Kaku Gothic New', sans-serif; display: grid; gap: 0.3em; }
+.menu__row-text { font-family: 'Zen Kaku Gothic New', sans-serif; display: grid; gap: 0.45em; }
 .menu__row-name {
   font-weight: 700; font-size: clamp(16px, 1.4vw, 25px);
   letter-spacing: 0.02em; line-height: 1.35; color: #1A1A1A;
 }
 .menu__row-desc { font-size: clamp(12px, 0.95vw, 16px); line-height: 1.6; color: #6B6156; text-wrap: pretty; }
+.menu__row-detail {
+  font-size: clamp(12px, 0.92vw, 15px); line-height: 1.75; color: #6B6156; text-wrap: pretty;
+}
 .menu__row-term {
   font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
   font-size: clamp(12px, 1vw, 18px); letter-spacing: 0.06em; color: #B3241C; white-space: nowrap;
@@ -331,7 +339,11 @@ a:hover { color: var(--color-red-bright); }
 .contact {
   position: relative; z-index: 2;
   scroll-margin-top: var(--header-height);
-  background: var(--color-paper) var(--paper-image) center center / cover no-repeat;
+  /* トップ(hero)の見え方は変えない。hero は高さ100svh固定のため、element毎の高さに依存するcoverでも
+     100svh基準でも結果は同じ。他のセクションはcoverだと自分の高さで縮尺が変わりheroと粒度がずれるため、
+     hero と同じ「高さ100svh基準」の縮尺に固定し、それより縦に長い分はrepeat-yで継ぎ足す
+     （セクションごとに壁紙の粒度が変わって見える問題への対処。基準はhero、hero側は変更しない） */
+  background: var(--color-paper) var(--paper-image) top center / auto 100svh repeat-y;
   color: var(--color-ink);
   padding: var(--section-space) var(--page-gutter);
 }
@@ -410,56 +422,6 @@ a:hover { color: var(--color-red-bright); }
   font-size: clamp(11px, 0.78vw, 13px); line-height: 1.7; color: #6B6156;
 }
 
-/* Native modal dialog owns focus containment, Escape and backdrop blocking. */
-.detail {
-  position: fixed; inset: 0; z-index: 10050;
-  width: 100%; height: 100%; max-width: none; max-height: none;
-  margin: 0; padding: 0; border: 0;
-  background: var(--color-paper) var(--paper-image) center center / cover no-repeat;
-  color: var(--color-ink);
-  overflow-y: auto; -webkit-overflow-scrolling: touch;
-}
-.detail:not([open]) { display: none; }
-.detail[open] { display: block; }
-.detail::backdrop { background: rgba(26, 26, 26, 0.58); }
-.detail__inner { min-height: 100%; display: grid; grid-template-rows: auto 1fr; align-content: start; }
-.detail__bar {
-  position: sticky; top: 0;
-  background: rgba(244, 239, 230, 0.94); backdrop-filter: blur(6px);
-  border-bottom: 1px solid #DCD2BF;
-  padding: clamp(14px, 1.4vw, 26px) clamp(20px, 2.4vw, 48px);
-  display: flex; justify-content: flex-start;
-}
-.detail__close {
-  appearance: none; box-sizing: border-box; cursor: pointer;
-  background: transparent; border-radius: 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
-  display: flex; align-items: center; gap: 0.6em;
-  font-weight: 700; font-size: clamp(12px, 0.95vw, 17px); letter-spacing: 0.1em;
-  color: #B3241C; padding: 0.7em 1.1em; border: 1px solid #B3241C;
-}
-.detail__close:hover { background: #B3241C; color: #F4EFE6; }
-
-.detail__panel {
-  display: block; max-width: 46em; margin: 0 auto;
-  padding: clamp(28px, 3vw, 60px) clamp(20px, 2.4vw, 48px) clamp(34px, 3.6vw, 72px);
-}
-.detail__title {
-  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
-  font-size: clamp(24px, 2.9vw, 52px); letter-spacing: 0.03em; line-height: 1.35; color: #1A1A1A;
-}
-.detail__meta { display: flex; align-items: center; gap: 0.8em; margin: clamp(16px, 1.8vw, 34px) 0; }
-.detail__meta-rule { display: block; width: clamp(24px, 2.6vw, 48px); height: 2px; background: #B3241C; }
-.detail__meta-label {
-  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
-  font-size: clamp(12px, 1vw, 18px); letter-spacing: 0.08em; color: #B3241C;
-}
-.detail__body {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
-  font-size: clamp(15px, 1.15vw, 21px); line-height: 2.1; letter-spacing: 0.02em;
-  color: #3A342C; text-wrap: pretty;
-}
-
 /* 320-767px: phone */
 @media (max-width: 767px) {
   :root {
@@ -479,9 +441,6 @@ a:hover { color: var(--color-red-bright); }
   .cards { padding-right: 48px; }
   .card { flex-basis: min(42vw, 170px); }
   .menu { align-content: start; }
-  .menu__listhead { align-items: flex-start; }
-  .menu__listhead-note { max-width: 12em; text-align: right; }
-  .menu__row { align-items: start; }
   .callout__row { align-items: flex-start; }
   .contact__inner { grid-template-columns: 1fr; }
   .form { padding: 20px; }

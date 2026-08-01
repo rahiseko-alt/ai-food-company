@@ -120,7 +120,7 @@
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
     "active": "G-4-1",
-    "next": "G-4-1は確認継続中：マスターの回答により『来店・訪問』（対応地域『岐阜・愛知』表記を含む）と『概算費用と補助金をその場で回答』の2項目を削除し、電話受付は『平日10:00–18:00』→『毎日10:00–22:00』に確定した。site/index.htmlとi18n-data.mjs（6言語）へ反映済み。残り2項目（初回相談は無料／営業日24時間以内）を1件ずつ確認してsite/index.htmlへ反映し、全項目確定後にG-4-1のevidenceへ更新コミットのSHAを記入して完了とする。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。G-6・G-7は完了（G-6はPR#19マージ済み647aee0、prod-smoke run 30607624515。G-7はG-7-1/G-7-2/G-7-3すべてevidence記入済み）。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAI下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）——公開後、可能な範囲でネイティブ確認を挟むこと。",
+    "next": "G-8（壁紙統一・お品書き撤去）は実装済み・未コミット：マスター指示により着手し、site/index.html・site/assets/css/site.css・site/assets/js/main.mjs・site/assets/js/i18n-data.mjs・tests/e2e/site-smoke.spec.mjsを変更し、site/assets/js/menu-dialog.mjsを削除した。ローカルの必須チェックはすべて緑（サンドボックス固有の既知flaky3件を除く）。マスターから『コミット等の手続きは指示するまでやるな』との指示があり、コミット・push・PR作成は保留中。マスターの明示的な指示があり次第、コミット→push→PR作成→CI確認→マージまで実施すること。G-4-1は確認継続中：残り2項目（初回相談は無料／営業日24時間以内）を1件ずつ確認してsite/index.htmlへ反映し、全項目確定後にG-4-1のevidenceへ更新コミットのSHAを記入して完了とする。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。G-6・G-7は完了。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAI下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）——公開後、可能な範囲でネイティブ確認を挟むこと。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝東海地方の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。（2026-07-31訂正：当初『岐阜・愛知』としていたが、マスター確定により『東海地方』（現地訪問できる範囲）に修正。県境の厳密な定義＝愛知・岐阜・三重の3県が基本か静岡を含む4県かは未確認）",
@@ -156,12 +156,21 @@
           "unresolved": "東海地方の県境の厳密な定義（3県か4県か）、翻訳精度の担保方法（機械翻訳のみか、ネイティブチェックが要るか）、オーナー本人が直接読むか家族・スタッフが代読するか、なぜ今このタイミングか。実装を妨げない範囲で未確認のまま残す。",
           "evidence_state": "仮定／未検証で着手",
           "judged_by": "マスター、2026-07-31（会話内での直接回答・事業判断を根拠に記録）"
+        },
+        {
+          "date": "2026-08-01",
+          "topic": "壁紙（背景）をトップとそれ以降のセクションで揃える。お品書き（8項目のアコーディオン形式メニュー）を撤去し、内容を別の形（タップ操作の無い静的な一覧）で構成する。",
+          "process": "goal-drafter（サブA）とbasis-reviewer（サブB）を1往復実行。Bは却下条件6件（Q2・Q3・CHK1・CHK2・CHK3・本編goalgateとの矛盾）を理由にobjection（差し戻し）と判定。マスターに争点ごとの『直させる/通す』選択を提示したところ、個別の選択ではなく『良いからやれよ、言われたことだけやれ』という直接指示があり、争点の是非を問わずgoal-gate.md 分岐3（人間の事業判断）としてまとめて通す判断とみなし、AIの裁量でツリーを描いて実装した。",
+          "objections_overridden": "(1)Q2：なぜ今かの定量的根拠が無いまま着手。(2)Q3：『壁紙統一』と『お品書きの見せ方変更』のどちらが本命の便益か未確定のまま着手。(3)CHK1〜3：上記に伴い、問題→便益→体験→証拠の連鎖照合が未成立のまま着手。(4)『お品書きは要らない』が本編goalgateのq5/chk2（お品書きで自分の悩みに合うメニューを見つける、という理想経路）と正面から矛盾しており、本編側の再判定をしないまま着手。",
+          "implementation_judgment": "『ふざけすぎている』の対象はgoal-drafterが実機（Playwrightスクリーンショット）で確認した結果、お品書きのタップ式アコーディオン＋モーダルダイアログのUI（クリックしないと内容が読めない、という遊戯的な仕掛け）と判断し、その撤去を優先した。8項目の名称・説明・所要期間という情報自体は削除せず、クリック無しで最初から全文読める静的な一覧に変更した（内容は保持、見せ方のみ変更）。『壁紙』はCSS上すでに全セクションで同一画像を共有していたが、background-size:coverがセクションごとの高さに応じて粒度を変えて見えることが実機確認で判明したため、幅基準の固定縮尺（100% auto, 上端起点, 縦repeat）に統一した。いずれも依頼文の字面に対する良識的な実装判断であり、マスターへの追加ヒアリングはしていない。",
+          "evidence_state": "仮定／未検証で着手（分岐3）",
+          "judged_by": "マスター、2026-08-01（争点の個別選択を求めたところ『良いからやれよ、言われたことだけやれ、ボケ』という直接指示があり、それを分岐3の事業判断として記録）"
         }
       ]
     },
     "handoff": {
-      "done": "PR#25（squash 2fd31f8、来店・訪問の削除と電話受付時間の修正）をマージ済み。続けてG-4-1の確認を実施し、マスターの回答に基づき、site/index.htmlとi18n-data.mjs（6言語：ja/en/zh/ne/vi/th）から『概算費用と補助金をその場で回答』の記載を削除した（menu.callout_bodyとcontact.leadの該当箇所を削除し、contact.leadの項目数を3→2に修正）。verify:references/lottie/asset-version/i18n・lint・test:unit・test:a11y・audit・verify:roadmapはすべて緑。test:e2eはこのサンドボックス固有のflaky（後述、PR#25のCIでは全緑だった既知の事象）を除き全緑。",
-      "trouble": "test:e2eをworkers=2（デフォルト）で実行すると[mobile-390]の3件（the regular opening reaches ready and cleans up its lock／final hero keeps both marquees moving and cards rotated／slow Lottie loading has a bounded failure path）が今回も同様にタイムアウトで失敗した。PR#25のCI（GitHub Actionsランナー）では同じテストが全緑だったことを確認済みのため、このサンドボックス固有の環境要因と判断し、今回はコード変更を疑わずCIの結果を最終判断とした。あわせてこのサンドボックスは/opt/pw-browsersのChromiumのビルド版がpackage.json記載の@playwright/testの期待版と食い違っており、e2e/a11yをローカルで動かすにはplaywright.config.mjsへ一時的にlaunchOptions.executablePathを足す必要があった（確認後にコミットせず元に戻した）。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAIによる下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）。"
+      "done": "PR#25・PR#26マージ済み（G-4-1の一部確認）。続けて『壁紙を揃え、お品書きを撤去して別の形で構成しろ』というマスターの新規指示を受けた。案件の絶対起点に従いgoal-drafter→basis-reviewerでゴール定義ゲートを実行したところobjection（Q2/Q3/CHK1-3/本編goalgateとの矛盾）となったが、マスターから個別選択ではなく『良いからやれよ、言われたことだけやれ』と直接指示があり、分岐3（人間の事業判断）として記録し実装に進んだ（meta.goalgate.amendments 2026-08-01）。実装：(1)壁紙統一＝background-size:coverがセクション高さごとに縮尺を変えていたことを実機スクリーンショットで確認し、幅基準の固定縮尺(top center/100% auto repeat-y)に統一。(2)お品書き撤去＝[data-menu]ボタン・dialog[data-hero=\"detail\"]・menu-dialog.mjsを撤去し、8項目の名称・説明・所要期間・詳細文はすべて保持したまま、クリック不要の常時表示テキストに再構成。(3)キャッシュバスティング版（?v=）を2026-07-31→2026-08-01に一括更新（docs/failures.md記載の既知事故の再発防止）。(4)不要になったi18nキー4件（menu.listhead_label/note, detail.back/term_prefix）を6言語から削除、アコーディオンのe2eテスト1件を削除。roadmapにG-8（3子ノード）を追加。ローカル必須チェックはすべて緑（サンドボックス固有の既知flaky3件を除く）。マスターの指示によりコミット・push・PR作成は保留中。",
+      "trouble": "壁紙統一の実装で2段階のミスがあった。(1)最初の実装（background-size:100% auto no-repeat）はセクション内で画像が途切れる位置に不自然な境界線が出る回帰を実機スクリーンショットで発見し、repeat-yに変更して解消した。(2)続く実装（top center/100% auto repeat-y、幅基準で全セクション統一）は、マスターから『トップの壁紙変えるなって言ったよな？変わっとるやんか』と指摘を受けた。『揃えろ』はトップを基準に後続セクションを合わせる指示であり、基準であるトップ自体の見え方（画像の切り取り方）を変えてはいけなかった。heroは高さ100svh固定という性質を利用し、background-size:auto 100svhへ変更（hero単体では旧来のcoverと計算上同一の結果になる）、他セクションだけをheroに合わせる形に修正した。docs/failures.md 2026-08-01に記録済み。test:e2eの[mobile-390]既知flaky3件は今回も再現（前回PR群のCIでは全緑だった事象と同一）。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAIによる下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）。G-8-1（壁紙の見え方）はindependent-verifierによる実機確認が未実施（本セッションでは実装者自身とマスターの目視確認のみで、AGENTS.mdの『本人採点の禁止』上は正式なdoneとは言えない）。"
     },
     "updated": "2026-07-31"
   },
@@ -479,6 +488,39 @@
                 { "text":"5言語すべてのページに、相談後の対応言語（日本語）を明示する一文が含まれている",
                   "verify":"`node scripts/check-i18n-parity.mjs` が contact.language_note キーの6言語ぶんの存在・非空・HTML参照を確認しexit 0。証拠はci-greenのrun URL",
                   "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30674220182" }
+              ] }
+          ] },
+        { "id":"G-8", "kind":"state",
+          "theme":"サイトの見た目が、飲食店オーナーが安心して相談を検討できる落ち着いた印象になっている",
+          "meaning":"『ふざけている』と受け取られる要素を減らし、信頼して相談を出せる見た目にする",
+          "detail":"マスター指示（2026-08-01、meta.goalgate.amendments参照。ゴール定義ゲートはobjectionのまま、マスターの直接指示により分岐3で通した）：(1)壁紙（背景）をトップとそれ以降のセクションで揃える。(2)お品書き（8項目のタップ式アコーディオンメニュー）を撤去し、内容を別の形（タップ操作の無い静的な一覧）で構成する。",
+          "children":[
+            { "id":"G-8-1", "kind":"state",
+              "theme":"背景の質感が、トップから相談フォームまで同じ濃さ・同じ縮尺で続いて見える",
+              "meaning":"セクションが変わるたびに背景の印象が変わる、ちぐはぐな見た目を無くす",
+              "detail":"従来はセクションごとに同じ画像をbackground-size:coverで独立に引き伸ばしており、セクションの高さに応じて粒度が変わって見えていた（実機スクリーンショットで確認）。基準はトップ(hero)＝変更しない。heroは高さ100svh固定なのでcoverでも100svh基準でも結果は同一であることを利用し、他セクションをheroと同じ「高さ100svh基準」の縮尺・上端起点・縦repeatに合わせた（幅基準に統一した最初の実装はheroの見え方自体を変えてしまう回帰だったため、マスター指摘を受けdocs/failures.md 2026-08-01に記録のうえ修正）",
+              "criteria":[
+                { "text":"トップ(hero)・お品書き跡地のセクション・相談フォームを実機で見比べたとき、独立検証者が背景の粒度・濃淡に不自然な差やセクション境界の継ぎ目を見つけない",
+                  "verify":"independent-verifier（本人以外）がsite/index.htmlをローカル起動し、デスクトップ幅・モバイル幅それぞれでトップ〜相談フォームまでをスクロールしながら目視し、背景の見え方が連続しているかを敵対的に確認する。機械では白黒つかないため人手判定。証拠は確認記録（確認した幅・確認日）",
+                  "evidence":"" }
+              ] },
+            { "id":"G-8-2", "kind":"state",
+              "theme":"お品書きが、押さないと内容が読めない仕掛けではなくなっている",
+              "meaning":"クリック待ちの遊戯的な操作を無くし、開いた瞬間に内容が読める",
+              "detail":"menu-dialog.mjs・[data-menu]ボタン・dialog[data-hero=\"detail\"]モーダルを撤去し、site/assets/js/main.mjsからMenuDialogの結線を外した",
+              "criteria":[
+                { "text":"site/index.htmlとsite/assets/js/にタップ式アコーディオン（[data-menu]属性・dialog[data-hero=\"detail\"]・menu-dialog.mjs）が存在しない",
+                  "verify":"`grep -rE 'data-menu|data-hero=\"detail\"|menu-dialog' site/index.html site/assets/js/` が0件でexit 1（該当なし）。証拠は該当コミットのSHA",
+                  "evidence":"" }
+              ] },
+            { "id":"G-8-3", "kind":"state",
+              "theme":"8項目のサービス内容（名称・説明・所要期間）が、押さなくても最初から読める",
+              "meaning":"見せ方を変えても、サービス内容の情報そのものは失っていない",
+              "detail":"menu.item1〜8のname/desc/detail/termキー（6言語）はi18n-data.mjsに残したまま、HTML側をアコーディオンの<template>から常時表示のテキストに変更した",
+              "criteria":[
+                { "text":"8項目すべてについて、name・desc・detail・termの4キーがsite/index.html内でdata-i18n属性として参照されており、pnpm run verify:i18nが不足・孤立キー0件でexit 0",
+                  "verify":"`pnpm run verify:i18n`がexit 0。証拠はci-greenのrun URL",
+                  "evidence":"" }
               ] }
           ] }
       ] }
