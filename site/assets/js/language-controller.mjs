@@ -1,4 +1,4 @@
-import { LANGUAGES, LANGUAGE_LABELS, I18N } from './i18n-data.mjs?v=2026-08-01';
+import { LANGUAGES, LANGUAGE_LABELS, I18N } from './i18n-data.mjs?v=2026-08-01b';
 
 const STORAGE_KEY = 'kfa:lang';
 const DEFAULT_LANG = 'ja';

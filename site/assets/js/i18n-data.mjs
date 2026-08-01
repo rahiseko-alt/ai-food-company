@@ -39,6 +39,7 @@ export const I18N = {
     'menu.eyebrow': '飲食専門のAI顧問',
     'menu.title': '人を増やす前に、\n人がやらなくていい仕事を減らす。',
     'menu.lead': '人手不足の深刻さは飲食が全業種でも最上位、2025年の飲食店の倒産は900件を超えて過去最多。募集を出し続けるより、シフト・発注・電話・口コミといった「毎日必ず発生する事務」を先に外すほうが早く効きます。ツールを売って終わりにはしません。現場に入って優先順位を決め、設定まで済ませ、翌月から数字で確かめます。',
+    'menu.profile': '飲食の現場に20年。そのうえで、AIの設定まで自分でやります。',
 
     'menu.item1.name': '現場診断',
     'menu.item1.desc': '一日ぶん張り付いて、時間とお金がどこで漏れているかを店ごとに洗い出す。',
@@ -128,6 +129,7 @@ export const I18N = {
     'menu.eyebrow': 'AI Advisor for Restaurants',
     'menu.title': 'Before hiring more people,\ncut the work people shouldn’t have to do.',
     'menu.lead': 'Restaurants face the worst labor shortage of any industry, and restaurant bankruptcies in Japan topped 900 in 2025, a record high. Rather than keep posting job ads, it is faster to first remove the paperwork that happens every single day — shifts, ordering, phone calls, review replies. We don’t just sell a tool and walk away. We go on-site, decide the priority order, finish the setup, and check the numbers again the following month.',
+    'menu.profile': 'Twenty years working in restaurants. That is why I set the AI up myself, on site.',
 
     'menu.item1.name': 'On-site Diagnosis',
     'menu.item1.desc': 'We spend a full day on the floor to find exactly where time and money are leaking, store by store.',
@@ -217,6 +219,7 @@ export const I18N = {
     'menu.eyebrow': '餐饮专属 AI 顾问',
     'menu.title': '在增加人手之前，\n先减少不必要由人来做的工作。',
     'menu.lead': '餐饮行业的人手短缺程度在所有行业中位居前列，2025年日本餐饮店倒闭数量超过900家，创下历史新高。与其持续招聘，不如先去掉每天必然发生的琐事——排班、订货、电话应对、点评回复——见效更快。我们不是卖完工具就撒手不管，而是深入现场，决定优先顺序，完成设置，并在次月用数字进行验证。',
+    'menu.profile': '在餐饮一线工作二十年。正因如此，AI 的设置也由我亲自到店完成。',
 
     'menu.item1.name': '现场诊断',
     'menu.item1.desc': '在店里蹲点一整天，逐店找出时间和金钱究竟漏在哪里。',
@@ -306,6 +309,7 @@ export const I18N = {
     'menu.eyebrow': 'रेस्टुरेन्टका लागि AI सल्लाहकार',
     'menu.title': 'थप मानिस राख्नु अघि,\nमानिसले नगर्नुपर्ने काम घटाऔं।',
     'menu.lead': 'जापानमा रेस्टुरेन्ट उद्योगमा जनशक्तिको अभाव सबैभन्दा गम्भीर छ, र २०२५ मा रेस्टुरेन्ट दिवालियापनको संख्या ९०० भन्दा बढी पुगी अहिलेसम्मकै उच्च भयो। लगातार भर्ना विज्ञापन दिनुभन्दा, सिफ्ट, अर्डर, फोन, समीक्षाको जवाफ जस्ता हरेक दिन हुने काम पहिले हटाउनु छिटो प्रभावकारी हुन्छ। हामी उपकरण मात्र बेचेर छोड्दैनौं। साइटमा गएर प्राथमिकता तय गर्छौं, सेटअप पूरा गर्छौं, र अर्को महिनादेखि नतिजा संख्यामा जाँच्छौं।',
+    'menu.profile': 'रेस्टुरेन्टको फिल्डमा २० वर्ष। त्यसैले AI को सेटअप पनि म आफैं ठाउँमै गएर गर्छु।',
 
     'menu.item1.name': 'स्थलगत निदान',
     'menu.item1.desc': 'पूरै एक दिन साइटमा बसेर, समय र पैसा कहाँ चुहिँदैछ भनेर हरेक पसलको लागि पत्ता लगाउँछौं।',
@@ -395,6 +399,7 @@ export const I18N = {
     'menu.eyebrow': 'Cố vấn AI chuyên ngành nhà hàng',
     'menu.title': 'Trước khi tuyển thêm người,\nhãy giảm bớt việc mà con người không cần phải làm.',
     'menu.lead': 'Ngành nhà hàng đang thiếu nhân lực nghiêm trọng nhất trong tất cả các ngành, và số vụ phá sản nhà hàng tại Nhật năm 2025 đã vượt 900, mức cao kỷ lục. Thay vì liên tục đăng tuyển, việc loại bỏ trước những công việc lặp lại hằng ngày như xếp ca, đặt hàng, nghe điện thoại, trả lời đánh giá sẽ có hiệu quả nhanh hơn. Chúng tôi không chỉ bán công cụ rồi thôi. Chúng tôi trực tiếp có mặt tại cửa hàng, quyết định thứ tự ưu tiên, hoàn tất cài đặt, và kiểm tra lại bằng số liệu vào tháng sau.',
+    'menu.profile': 'Hai mươi năm làm việc trong ngành nhà hàng. Chính vì vậy, tôi tự mình đến cửa hàng cài đặt AI.',
 
     'menu.item1.name': 'Chẩn đoán tại chỗ',
     'menu.item1.desc': 'Chúng tôi có mặt trọn một ngày tại cửa hàng để tìm ra chính xác thời gian và tiền bạc đang bị thất thoát ở đâu.',
@@ -484,6 +489,7 @@ export const I18N = {
     'menu.eyebrow': 'ที่ปรึกษา AI เฉพาะทางร้านอาหาร',
     'menu.title': 'ก่อนจะเพิ่มคน\nลดงานที่ไม่จำเป็นต้องให้คนทำก่อน',
     'menu.lead': 'ธุรกิจร้านอาหารขาดแคลนแรงงานรุนแรงที่สุดในทุกอุตสาหกรรม และในปี 2025 จำนวนร้านอาหารในญี่ปุ่นที่ปิดกิจการมีมากกว่า 900 แห่ง ซึ่งสูงที่สุดเป็นประวัติการณ์ แทนที่จะประกาศรับสมัครงานต่อไปเรื่อยๆ การตัดงานประจำวันที่ต้องทำทุกวัน เช่น การจัดตารางกะ การสั่งของ รับโทรศัพท์ ตอบรีวิว ออกก่อน จะเห็นผลเร็วกว่า เราไม่ได้แค่ขายเครื่องมือแล้วจบ แต่จะลงพื้นที่จริง กำหนดลำดับความสำคัญ ติดตั้งให้เสร็จ แล้วตรวจสอบด้วยตัวเลขอีกครั้งในเดือนถัดไป',
+    'menu.profile': 'ทำงานในร้านอาหารมา 20 ปี ด้วยเหตุนี้ ผมจึงลงไปตั้งค่า AI ที่ร้านด้วยตัวเอง',
 
     'menu.item1.name': 'วินิจฉัยหน้างาน',
     'menu.item1.desc': 'ลงพื้นที่ทั้งวัน เพื่อค้นหาว่าเวลาและเงินรั่วไหลไปที่ใดในแต่ละร้าน',

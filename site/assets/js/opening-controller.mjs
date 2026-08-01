@@ -1,4 +1,4 @@
-import { OPENING_STATES } from './config.mjs?v=2026-08-01';
+import { OPENING_STATES } from './config.mjs?v=2026-08-01b';
 
 const waitForFonts = (timeoutMs) => {
   if (!document.fonts?.ready) return Promise.resolve();
