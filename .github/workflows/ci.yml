@@ -1,18 +1,47 @@
 name: CI
 
+# push は main だけをトリガーにする（feature branchへのpushはpull_requestイベントで既にCIが走るため、
+# 両方を対象にすると同一コミットに対してCIが2回丸ごと走り、待ち時間が単純に倍になっていた。
+# 2026-08-01 マスター指摘で発覚・修正）。
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
   pull_request:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: detect change scope
+    runs-on: ubuntu-latest
+    outputs:
+      behavior: ${{ steps.filter.outputs.behavior }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: filter
+        name: JS・演出・e2e関連のファイルが変わっているか確認
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # 差分の基準が取れない場合（新規ブランチ・force-push直後等）は安全側に倒してtrueにする。
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA" 2>/dev/null; then
+            echo "behavior=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only "$BASE_SHA" HEAD | grep -qE '^(site/assets/js/|site/index\.html$|tests/e2e/|playwright\.config\.mjs$|site/assets/vendor/)'; then
+            echo "behavior=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "behavior=false" >> "$GITHUB_OUTPUT"
+          fi
+
   quality:
     name: references / lint / unit / audit / roadmap
     runs-on: ubuntu-latest
@@ -59,6 +88,11 @@ jobs:
 
   browser:
     name: Playwright / axe
+    needs: changes
+    # 文言・スタイルだけの変更ではJS/演出は壊れようがないため、対象ファイルが変わったときだけ走らせる
+    # （e2e約5分・a11y約1.5分はCIの待ち時間の大半を占めていたため、2026-08-01 マスター指摘で必須から外した）。
+    # ci-green（下のgate）はこのjobの結果を待たない＝マージの必須条件ではない。
+    if: needs.changes.outputs.behavior == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -99,17 +133,19 @@ jobs:
 
   gate:
     name: ci-green
-    needs: [quality, browser]
+    # ci-green が待つのは quality（数秒〜数十秒で終わる機械検証）だけ。browser(e2e/a11y)は
+    # 該当ファイルが変わったときだけ参考として走るが、マージの必須条件にはしない
+    # （2026-08-01 マスター指摘：一文・一単語の変更を軽く速くできることを優先する）。
+    needs: [quality]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Require every quality job
+      - name: Require the quality job
         env:
           QUALITY_RESULT: ${{ needs.quality.result }}
-          BROWSER_RESULT: ${{ needs.browser.result }}
         run: |
-          if [ "$QUALITY_RESULT" != "success" ] || [ "$BROWSER_RESULT" != "success" ]; then
-            echo "ci-green: FAIL (quality=$QUALITY_RESULT browser=$BROWSER_RESULT)"
+          if [ "$QUALITY_RESULT" != "success" ]; then
+            echo "ci-green: FAIL (quality=$QUALITY_RESULT)"
             exit 1
           fi
           echo "ci-green: OK"
