@@ -1,6 +1,7 @@
 import { OPENING_CONFIG } from './config.mjs?v=2026-07-31';
 import { ContactController } from './contact-controller.mjs?v=2026-07-31';
 import { HashNavigation } from './hash-navigation.mjs?v=2026-07-31';
+import { LanguageController } from './language-controller.mjs?v=2026-07-31';
 import { LottieLoader } from './lottie-loader.mjs?v=2026-07-31';
 import { MenuDialog } from './menu-dialog.mjs?v=2026-07-31';
 import { OpeningController } from './opening-controller.mjs?v=2026-07-31';
@@ -24,11 +25,13 @@ if (root) {
   const menu = new MenuDialog(root);
   const contact = new ContactController(root.querySelector('[data-hero="contactform"]'));
   const hashNavigation = new HashNavigation();
+  const language = new LanguageController(root);
 
   menu.start();
   contact.start();
   hashNavigation.start();
   opening.start();
+  language.start();
 
-  window.koseFoodAi = Object.freeze({ opening, menu, contact, hashNavigation });
+  window.koseFoodAi = Object.freeze({ opening, menu, contact, hashNavigation, language });
 }

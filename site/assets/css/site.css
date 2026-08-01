@@ -80,6 +80,19 @@ a:hover { color: var(--color-red-bright); }
 }
 .header__cta:hover { color: var(--color-paper); }
 
+/* --- 言語切替（G-7） ---------------------------------------------------- */
+.header__lang { display: flex; align-items: center; margin-right: clamp(14px, 1.46vw, 28px); }
+.header__lang-select {
+  appearance: none; box-sizing: border-box; cursor: pointer;
+  background: rgba(0, 0, 0, 0.28); color: var(--color-paper);
+  border: 1px solid rgba(244, 239, 230, 0.4); border-radius: 2px;
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 0.78vw, 14px); letter-spacing: 0.02em;
+  padding: 0.45em 0.7em; line-height: 1.2;
+}
+.header__lang-select:hover { border-color: var(--color-paper); }
+.header__lang-select:focus-visible { outline: 2px solid var(--color-red-bright); outline-offset: 2px; }
+
 [data-opening-state="loading"] .header {
   opacity: 0;
   pointer-events: none;
@@ -344,6 +357,11 @@ a:hover { color: var(--color-red-bright); }
 .contact__dl > div { display: flex; gap: 0.8em; }
 .contact__dl dt { color: #6B6156; min-width: 5.5em; }
 
+.contact__lang-note {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: clamp(11px, 0.82vw, 14px); line-height: 1.75; color: #6B6156;
+}
+
 .form {
   display: grid; gap: clamp(14px, 1.4vw, 24px);
   padding: clamp(20px, 2.2vw, 40px);
@@ -451,8 +469,11 @@ a:hover { color: var(--color-red-bright); }
   }
 
   .header { padding-inline: 14px; }
-  .header__nav { margin-right: 10px; }
+  /* 「ホーム」リンクはブランドロゴのリンク先と重複する。幅の狭い画面では言語切替を優先する */
+  .header__nav { display: none; }
   .header__brand > span { font-size: 16px; }
+  .header__lang { margin-right: 10px; }
+  .header__lang-select { padding: 0.4em 0.5em; font-size: 11px; }
   .header__cta { padding: 12px 14px; }
   .runway { height: 320svh; }
   .cards { padding-right: 48px; }

@@ -372,6 +372,34 @@ test('menu dialog blocks the background and restores focus', async ({ page }) =>
     .not.toBe('hidden');
 });
 
+test('language switcher updates key content and persists across reload', async ({ page }, testInfo) => {
+  useFocusedProject(testInfo, 'desktop-1024');
+  await page.goto('/#top');
+  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('ホーム');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+
+  await page.selectOption('.header__lang-select', 'en');
+  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('Home');
+  await expect(page.locator('[data-i18n="header.cta"]')).toHaveText('Contact ›');
+  await expect(page.locator('[data-i18n="contact.language_note"]')).toHaveText(
+    'Follow-up after your inquiry (phone calls, meetings) will be conducted in Japanese.',
+  );
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+
+  await page.reload();
+  await expect(page.locator('.header__lang-select')).toHaveValue('en');
+  await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('Home');
+});
+
+test('language switcher stays reachable on mobile', async ({ page }, testInfo) => {
+  useFocusedProject(testInfo, 'mobile-390');
+  await page.goto('/#top');
+  await expect(page.locator('.header__lang-select')).toBeVisible();
+  await expect(page.locator('.header__nav')).toBeHidden();
+  await page.selectOption('.header__lang-select', 'en');
+  await expect(page.locator('[data-i18n="header.cta"]')).toHaveText('Contact ›');
+});
+
 test('form clears fields only after confirmed FormSubmit success', async ({ page }, testInfo) => {
   useFocusedProject(testInfo, 'desktop-1024');
   let requests = 0;

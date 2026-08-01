@@ -42,6 +42,9 @@ jobs:
       - name: Check asset version consistency
         run: pnpm run verify:asset-version
 
+      - name: Check i18n parity
+        run: pnpm run verify:i18n
+
       - name: Lint HTML, CSS, and JavaScript
         run: pnpm run lint
 
