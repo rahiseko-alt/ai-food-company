@@ -278,6 +278,13 @@ a:hover { color: var(--color-red-bright); }
   font-family: 'Zen Kaku Gothic New', sans-serif; max-width: 44em;
   font-size: clamp(13px, 1.02vw, 18px); line-height: 1.85; color: #6B6156; text-wrap: pretty;
 }
+/* 代表の年数を、OGP（SNS共有時のみ表示）ではなく本文で見えるようにする一行。
+   data-i18n は要素の中身を作り直すため、強調用の入れ子タグは置かず行ごとスタイルで立たせる */
+.menu__profile {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700; max-width: 44em;
+  font-size: clamp(14px, 1.12vw, 20px); line-height: 1.8; color: #1A1A1A; text-wrap: pretty;
+  border-left: 3px solid #B3241C; padding-left: clamp(10px, 1vw, 18px);
+}
 
 .menu__list { display: grid; gap: clamp(18px, 1.8vw, 28px); justify-items: stretch; text-align: left; }
 .menu__item { display: block; }

@@ -1,10 +1,10 @@
-import { OPENING_CONFIG } from './config.mjs?v=2026-08-01';
-import { ContactController } from './contact-controller.mjs?v=2026-08-01';
-import { HashNavigation } from './hash-navigation.mjs?v=2026-08-01';
-import { LanguageController } from './language-controller.mjs?v=2026-08-01';
-import { LottieLoader } from './lottie-loader.mjs?v=2026-08-01';
-import { OpeningController } from './opening-controller.mjs?v=2026-08-01';
-import { ScrollScene } from './scroll-scene.mjs?v=2026-08-01';
+import { OPENING_CONFIG } from './config.mjs?v=2026-08-01b';
+import { ContactController } from './contact-controller.mjs?v=2026-08-01b';
+import { HashNavigation } from './hash-navigation.mjs?v=2026-08-01b';
+import { LanguageController } from './language-controller.mjs?v=2026-08-01b';
+import { LottieLoader } from './lottie-loader.mjs?v=2026-08-01b';
+import { OpeningController } from './opening-controller.mjs?v=2026-08-01b';
+import { ScrollScene } from './scroll-scene.mjs?v=2026-08-01b';
 
 const root = document.querySelector('[data-hero="root"]');
 
