@@ -382,7 +382,7 @@ export const I18N = {
     'form.name_label': 'तपाईंको नाम',
     'form.name_placeholder': 'उदाहरण: यामादा तारो',
     'form.contact_label': 'सम्पर्क (इमेल वा फोन)',
-    'form.contact_placeholder': 'उदाहरण: ०८०-०००-०००',
+    'form.contact_placeholder': 'उदाहरण: 080-0000-0000',
     'form.detail_label': 'अहिले भइरहेको समस्या (वैकल्पिक)',
     'form.detail_placeholder': 'उदाहरण: सिफ्ट बनाउन महिनाको २० घण्टा लाग्छ／खाना खेर जाने कुरा घट्दैन',
     'form.submit': 'निःशुल्क सल्लाहको लागि अनुरोध गर्नुहोस् ›',

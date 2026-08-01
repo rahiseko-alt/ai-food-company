@@ -391,6 +391,15 @@ test('language switcher updates key content and persists across reload', async (
   await expect(page.locator('[data-i18n="nav.home"]')).toHaveText('Home');
 });
 
+test('language switcher stays reachable on mobile', async ({ page }, testInfo) => {
+  useFocusedProject(testInfo, 'mobile-390');
+  await page.goto('/#top');
+  await expect(page.locator('.header__lang-select')).toBeVisible();
+  await expect(page.locator('.header__nav')).toBeHidden();
+  await page.selectOption('.header__lang-select', 'en');
+  await expect(page.locator('[data-i18n="header.cta"]')).toHaveText('Contact ›');
+});
+
 test('form clears fields only after confirmed FormSubmit success', async ({ page }, testInfo) => {
   useFocusedProject(testInfo, 'desktop-1024');
   let requests = 0;

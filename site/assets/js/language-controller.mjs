@@ -2,6 +2,11 @@ import { LANGUAGES, LANGUAGE_LABELS, I18N } from './i18n-data.mjs?v=2026-07-31';
 
 const STORAGE_KEY = 'kfa:lang';
 const DEFAULT_LANG = 'ja';
+const ATTR_BINDINGS = [
+  ['data-i18n-placeholder', 'placeholder'],
+  ['data-i18n-aria-label', 'aria-label'],
+  ['data-i18n-alt', 'alt'],
+];
 
 // ヘッダーの言語切替UIと、ページ内 [data-i18n] 要素の文言差し替えを担当する独立モジュール。
 // オープニング／スクロール演出（opening-controller.mjs, scroll-scene.mjs）の
@@ -18,7 +23,6 @@ export class LanguageController {
     if (!this.mount) return;
     this.select = document.createElement('select');
     this.select.className = 'header__lang-select';
-    this.select.setAttribute('aria-label', I18N[DEFAULT_LANG]['lang.label']);
     for (const code of LANGUAGES) {
       const option = document.createElement('option');
       option.value = code;
@@ -63,6 +67,10 @@ export class LanguageController {
     const dict = I18N[lang] || I18N[DEFAULT_LANG];
     document.documentElement.lang = lang;
 
+    if (this.select) {
+      this.select.setAttribute('aria-label', dict['lang.label']);
+    }
+
     for (const el of this.root.querySelectorAll('[data-i18n]')) {
       const key = el.getAttribute('data-i18n');
       const value = dict[key];
@@ -70,22 +78,11 @@ export class LanguageController {
       setTextWithLineBreaks(el, value);
     }
 
-    for (const el of this.root.querySelectorAll('[data-i18n-placeholder]')) {
-      const key = el.getAttribute('data-i18n-placeholder');
-      const value = dict[key];
-      if (value != null) el.setAttribute('placeholder', value);
-    }
-
-    for (const el of this.root.querySelectorAll('[data-i18n-aria-label]')) {
-      const key = el.getAttribute('data-i18n-aria-label');
-      const value = dict[key];
-      if (value != null) el.setAttribute('aria-label', value);
-    }
-
-    for (const el of this.root.querySelectorAll('[data-i18n-alt]')) {
-      const key = el.getAttribute('data-i18n-alt');
-      const value = dict[key];
-      if (value != null) el.setAttribute('alt', value);
+    for (const [dataAttr, targetAttr] of ATTR_BINDINGS) {
+      for (const el of this.root.querySelectorAll(`[${dataAttr}]`)) {
+        const value = dict[el.getAttribute(dataAttr)];
+        if (value != null) el.setAttribute(targetAttr, value);
+      }
     }
 
     for (const tpl of this.root.querySelectorAll('template[data-i18n-template]')) {
@@ -99,6 +96,8 @@ export class LanguageController {
 
   destroy() {
     this.select?.removeEventListener('change', this.onChange);
+    this.select?.remove();
+    this.select = null;
   }
 }
 

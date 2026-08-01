@@ -7,10 +7,12 @@
 //   3. index.html が参照する data-i18n / data-i18n-placeholder / data-i18n-aria-label /
 //      data-i18n-alt / data-i18n-template のキーが、すべて辞書に実在すること（逆に辞書にあって
 //      HTMLで未使用のキーも報告する。孤立キーの放置を防ぐ）
+//   4. LANGUAGES に無い I18N の言語（誰にも選ばれない死んだデータ）と、LANGUAGE_LABELS の欠落
+//      （言語セレクトが空欄の選択肢を出す事故）を検出すること
 // を機械で強制する。値そのものの翻訳品質までは判定しない。
 
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,8 +20,8 @@ const ROOT = resolve(__dirname, "..");
 const SITE = join(ROOT, "site");
 
 async function main() {
-  const { LANGUAGES, I18N } = await import(
-    join(SITE, "assets", "js", "i18n-data.mjs")
+  const { LANGUAGES, LANGUAGE_LABELS, I18N } = await import(
+    pathToFileURL(join(SITE, "assets", "js", "i18n-data.mjs")).href
   );
 
   const violations = [];
@@ -31,6 +33,20 @@ async function main() {
   const baseKeys = new Set(Object.keys(I18N.ja || {}));
   if (baseKeys.size === 0) {
     violations.push("I18N.ja にキーが1つもありません");
+  }
+
+  const undeclared = Object.keys(I18N).filter((l) => !LANGUAGES.includes(l));
+  if (undeclared.length > 0) {
+    violations.push(
+      `I18N にあるが LANGUAGES で宣言されていない言語（誰にも選ばれない死んだデータ）: ${undeclared.join(", ")}`,
+    );
+  }
+
+  for (const lang of LANGUAGES) {
+    const label = LANGUAGE_LABELS?.[lang];
+    if (typeof label !== "string" || label.trim() === "") {
+      violations.push(`LANGUAGE_LABELS.${lang} が空、または未定義です`);
+    }
   }
 
   for (const lang of LANGUAGES) {
@@ -96,4 +112,8 @@ async function main() {
   );
 }
 
-main();
+main().catch((error) => {
+  console.error("✗ 多言語対応の整合性: 検査自体が失敗しました");
+  console.error(error);
+  process.exit(1);
+});

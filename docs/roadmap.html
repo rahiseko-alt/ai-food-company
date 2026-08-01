@@ -119,8 +119,8 @@
   "meta": {
     "title": "ロードマップ｜Kose Food AI サイト公開",
     "template": false,
-    "active": "G-7-1",
-    "next": "G-7（多言語対応）のコードは実装済み・ローカル検証済みだが、evidence（CI run URL）は未記入。PRマージ後、prod-smoke相当のCIが緑になったらG-7-1/G-7-2/G-7-3にrun URLを記入して完了させる。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAI下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）——公開後、可能な範囲でネイティブ確認を挟むこと。G-7完了後はG-4-1（相談の条件：初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する作業に戻る。あわせて対象地域を『岐阜・愛知』→『東海地方』に訂正した今回の判断（meta.goalgate.amendments）を、G-4-1の文言確認と同時にsite/index.htmlの表記にも反映するか要確認。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。G-6は完了（PR#19マージ済み647aee0、prod-smoke run 30607624515でG-6-2も緑）。",
+    "active": "G-4-1",
+    "next": "G-7（多言語対応）はPR#21のCI run 30674220182でG-7-1（言語切替e2eテスト）・G-7-2（check-i18n-parity.mjs）・G-7-3（相談後は日本語対応の一文）とも緑を確認し、evidenceを記入済み。マージ後、prod-smokeで本番反映を確認すること。ne/vi/th（ネパール語・ベトナム語・タイ語）の訳文はAI下訳のままネイティブ未確認（meta.goalgate.amendments unresolved参照）——公開後、可能な範囲でネイティブ確認を挟むこと。次はG-4-1（相談の条件：初回相談は無料／営業日24時間以内／オンライン30分・来店訪問／概算費用と補助金をその場で回答／電話は平日10:00-18:00）をマスターに1件ずつ確認してsite/index.htmlへ反映する。あわせて対象地域を『岐阜・愛知』→『東海地方』に訂正した今回の判断（meta.goalgate.amendments）を、G-4-1の文言確認と同時にsite/index.htmlの表記にも反映するか要確認。G-4-2はよくある質問を出すか消すかの判断のみ。G-4-3のOG画像は支給待ち。G-3-1とG-3-2は本番でフォームの実送信受信確認をやり直すこと（これまでの検証は全て通信スタブ）。G-6は完了（PR#19マージ済み647aee0、prod-smoke run 30607624515でG-6-2も緑）。",
     "goalgate": {
       "answers": {
         "q1": "買う人＝東海地方の飲食店オーナー（個人店〜小規模チェーン）。使う人＝その店の店長・現場スタッフ。買う人と使う人が別なので、サイトはオーナーが読んで判断できる言葉で書かれている必要がある。（2026-07-31訂正：当初『岐阜・愛知』としていたが、マスター確定により『東海地方』（現地訪問できる範囲）に修正。県境の厳密な定義＝愛知・岐阜・三重の3県が基本か静岡を含む4県かは未確認）",
@@ -456,10 +456,10 @@
             { "id":"G-7-1", "kind":"state",
               "theme":"ヘッダーの言語ボタンを押すと、選んだ言語の表示に切り替わる",
               "meaning":"多言語対応の入口となる仕組みそのものが動く",
-              "detail":"日本語を含む6言語（ja/en/zh/ne/vi/th）を切り替えられる。オープニング・スクロール演出のJSとは独立させ、DOM移動量やタイマーに依存させない（AGENTS.mdの結合ルール）",
+              "detail":"日本語を含む6言語（ja/en/zh/ne/vi/th）を切り替えられる。オープニング・スクロール演出のJSとは独立させ、DOM移動量やタイマーに依存させない（AGENTS.mdの結合ルール）。あわせてCloudflare Pagesのブランチプレビュー https://claude-checkin-kgggep.ai-food-company.pages.dev で実機確認済み",
               "criteria":[
                 { "text":"ヘッダーの言語切替UIを操作すると、ページ内の主要文言（ヒーロー・お品書き・相談フォームのラベル）が選択した言語の文言に切り替わり、選択状態が再訪時も保持される",
-                  "verify":"`language switcher updates key content and persists across reload`（tests/e2e/site-smoke.spec.mjs）がPlaywrightで日→英切替・lang属性・reload後の永続化を確認しexit 0。証拠はci-greenのrun URL。あわせてCloudflare Pagesのプレビュー https://55ac389d.ai-food-company.pages.dev で実機確認",
+                  "verify":"`language switcher updates key content and persists across reload`（tests/e2e/site-smoke.spec.mjs）がPlaywrightで日→英切替・lang属性・reload後の永続化を確認しexit 0。証拠はci-greenのrun URL",
                   "evidence":"https://github.com/rahiseko-alt/kose-food-ai-hp/actions/runs/30674220182" }
               ] },
             { "id":"G-7-2", "kind":"state",
